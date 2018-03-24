@@ -1,0 +1,10 @@
+# Cloned codebase
+omniport/
+
+# Base-level environment file
+environment/base.env
+
+# Ignore the site-specific environment files
+environment/sites/*
+# ... but commit the stencil for the site-specific environment files
+!environment/sites/site-stencil.env
