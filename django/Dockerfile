@@ -17,12 +17,14 @@ WORKDIR /
 # This command implies an image rebuild when requirements.txt changes
 COPY ./omniport/requirements.txt ./requirements.txt
 
-# Install GCC
+# Install dependencies
+RUN apk update \
+    && apk upgrade \
+    && apk add --no-cache --virtual .dependencies \
+    build-base gcc postgresql-dev libffi-dev musl-dev jpeg-dev zlib-dev bash
+
 # Upgrade pip, if an upgrade is out
+RUN ["pip", "install", "--upgrade", "pip"]
+
 # Install packages listed in requirements.txt
-# Clean up to keep the image small
-RUN apk add --no-cache --virtual .build-deps \
-    build-base gcc postgresql-dev libffi-dev musl-dev jpeg-dev zlib-dev \
-    && pip install --upgrade pip \
-    && pip install --requirement requirements.txt \
-    && apk del .build-deps
+RUN ["pip", "install", "--requirement", "requirements.txt"]
