@@ -1,6 +1,6 @@
-# Use Python, unfortunately not from the Alpine Linux project
+# Use Python, unfortunately not from the Alpine Linux project nor Slim
 # This is because of a problem in compiling C code when using pip install
-FROM python:slim
+FROM python
 
 # Add labels for metadata
 LABEL maintainer="Dhruv Bhanushali <https://dhruvkb.github.io/>"
