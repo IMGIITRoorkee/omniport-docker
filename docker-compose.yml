@@ -1,0 +1,201 @@
+# The version of the docker-compose standard being followed here
+version: '3'
+
+# Services are groups of containers handling one aspect of the application
+services:
+  database: # PostgreSQL
+    image: postgres:alpine
+
+    # No matter what, if the container stops, start it again
+    restart: always
+
+    # Expose the port 5432 used by PostgreSQL to other containers
+    # This port is not exposed to the host
+    expose:
+      - "5432"
+
+    # Set the environment variables
+    env_file:
+    - environment/base.env
+
+    # Mount the volumes on the database container
+    volumes:
+      # Mount 'database' as the place where PostgreSQL stores all its data
+      - database:/var/lib/postgresql/data
+
+      # Mount 'database_backup' as its namesake in the root of the container
+      - database_backup:/database_backup
+
+  channel-layer: # Redis
+    # Use the Redis image from Alpine Linux as is
+    image: redis:alpine
+
+    # No matter what, if the container stops, start it again
+    restart: always
+
+    # Set the environment variables
+    env_file:
+      - environment/base.env
+
+    # Expose the port 6379 used by Redis to other containers
+    # This port is not exposed to the host
+    expose:
+      - "6379"
+
+  session-store: # Redis
+    # Use the Redis image from Alpine Linux as is
+    image: redis:alpine
+
+    # No matter what, if the container stops, start it again
+    restart: always
+
+    # Set the environment variables
+    env_file:
+      - environment/base.env
+
+    # Expose the port 6379 used by Redis to other containers
+    # This port is not exposed to the host
+    expose:
+      - "6379"
+
+  intranet-server: # Gunicorn + Daphne
+    # Use the Django image we made ourselves by running ./scripts/build_django.sh
+    image: omniport-django:latest
+
+    # No matter what, if the container stops, start it again
+    restart: always
+
+    # Set the environment variables
+    env_file:
+      - environment/base.env
+      - environment/sites/intranet.env
+
+    # Expose the port 8001 used by Gunicorn to other containers
+    expose:
+      - "8001"
+      - "8003"
+
+    # Change the port to ensure that each site runs on its own port
+    command: bash -c "gunicorn -b 0.0.0.0:8001 --reload omniport.wsgi"
+
+    # We mount the volumes on the Gunicorn container
+    volumes:
+      # Mount the code from the 'omniport' folder in the root of the container 
+      - ./omniport:/omniport
+      
+      # Mount 'media' as its namesake in the root of the container
+      - media:/media
+
+      # Mount 'media_backup' as its namesake in the root of the container
+      - media_backup:/media_backup
+
+      # Mount 'gunicorn_logs' as its namesake in the root of the container
+      - gunicorn_logs:/gunicorn_logs
+
+      # Mount 'daphne_logs' as its namesake in the root of the container
+      - daphne_logs:/daphne_logs
+
+    # The services that need to be ready before this one
+    depends_on:
+      - database
+      - channel-layer
+      - session-store
+
+  internet-server: # Gunicorn + Daphne
+    # Use the Django image we made ourselves by running ./scripts/build_django.sh
+    image: omniport-django:latest
+
+    # No matter what, if the container stops, start it again
+    restart: always
+
+    # Set the environment variables
+    env_file:
+      - environment/base.env
+      - environment/sites/internet.env
+
+    # Expose the port 8002 used by Gunicorn to other containers
+    expose:
+      - "8002"
+      - "8004"
+
+    # Change the port to ensure that each site runs on its own port
+    command: bash -c "gunicorn -b 0.0.0.0:8002 --reload omniport.wsgi"
+
+    # We mount the volumes on the Gunicorn container
+    volumes:
+      # Mount the code from the 'omniport' folder in the root of the container 
+      - ./omniport:/omniport
+      
+      # Mount 'media' as its namesake in the root of the container
+      - media:/media
+
+      # Mount 'media_backup' as its namesake in the root of the container
+      - media_backup:/media_backup
+
+      # Mount 'gunicorn_logs' as its namesake in the root of the container
+      - gunicorn_logs:/gunicorn_logs
+
+      # Mount 'daphne_logs' as its namesake in the root of the container
+      - daphne_logs:/daphne_logs
+
+    # The services that need to be ready before this one
+    depends_on:
+      - database
+      - channel-layer
+      - session-store
+
+  reverse-proxy: # NGINX
+    # Use the NGINX image we made ourselves by running ./scripts/build_nginx.sh
+    image: omniport-nginx:latest
+
+    # No matter what, if the container stops, start it again
+    restart: always
+
+    # Set the environment variables
+    env_file:
+      - environment/base.env
+
+    # Expose the port 80 and 443 used by NGINX to other containers
+    expose:
+      - "80"
+      - "443"
+
+    # Expose the ports 80 and 443 used by NGINX to the host
+    ports:
+      - "80:80"
+      - "443:443"
+
+    # Mount the volumes on the NGINX container
+    volumes:
+      # Mount the code from the 'instiport' folder in the root of the container 
+      - ./omniport:/omniport
+
+      # Mount 'media' as its namesake in the root of the container
+      - media:/media
+
+      # Mount 'nginx_logs' as its namesake in the root of the container
+      - nginx_logs:/nginx_logs
+
+    # The services that need to be ready before this one
+    depends_on:
+      - intranet-server
+      - internet-server
+
+# Volumes are virtual drives connected to containers
+volumes:
+  # This volume contains the database and PostgreSQL configuration files
+  database:
+  # This volume contains periodic dumps of the database for backup
+  database_backup:
+
+  # This volume contains Gunicorn logs
+  gunicorn_logs:
+  # This volume contains Daphne logs
+  daphne_logs:
+  # This volume contains NGINX logs
+  nginx_logs:
+
+  # This volume contains the media files
+  media:
+  # This volume contains periodic dumps of the media files for backup
+  media_backup:
