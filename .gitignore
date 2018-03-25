@@ -1,5 +1,6 @@
 # Cloned codebase
 omniport/
+omniport
 
 # Base-level environment file
 environment/base.env
