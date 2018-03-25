@@ -1,6 +1,5 @@
-# Use Python, unfortunately not from the Alpine Linux project nor Slim
-# This is because of a problem in compiling C code when using pip install
-FROM python
+# Use Python from the Alpine Linux project
+FROM python:alpine
 
 # Add labels for metadata
 LABEL maintainer="Dhruv Bhanushali <https://dhruvkb.github.io/>"
@@ -18,8 +17,12 @@ WORKDIR /
 # This command implies an image rebuild when requirements.txt changes
 COPY ./omniport/requirements.txt ./requirements.txt
 
-# Update pip to the latest version
-RUN ["pip", "install", "--upgrade", "pip"]
-
-# Install packages listed in the requirements.txt file
-RUN ["pip", "install", "--requirement", "requirements.txt"]
+# Install GCC
+# Upgrade pip, if an upgrade is out
+# Install packages listed in requirements.txt
+# Clean up to keep the image small
+RUN apk add --no-cache --virtual .build-deps \
+    build-base gcc postgresql-dev libffi-dev musl-dev jpeg-dev zlib-dev \
+    && pip install --upgrade pip \
+    && pip install --requirement requirements.txt \
+    && apk del .build-deps
