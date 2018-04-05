@@ -8,7 +8,7 @@ LABEL maintainer="Dhruv Bhanushali <https://dhruvkb.github.io/>"
 EXPOSE 8000
 
 # Define environment variables
-ENV PYTHONPATH="/omniport:/omniport/apps"
+ENV PYTHONPATH="/omniport:/omniport/apps:/omniport/services"
 
 # Work in the root directory of the container
 WORKDIR /
@@ -20,11 +20,13 @@ COPY ./omniport/requirements.txt ./requirements.txt
 # Install dependencies
 RUN apk update \
     && apk upgrade \
-    && apk add --no-cache --virtual .dependencies \
-    build-base gcc postgresql-dev libffi-dev musl-dev jpeg-dev zlib-dev bash
+    && apk add --no-cache --virtual .removable-dependencies \
+    build-base gcc libffi-dev musl-dev \
+    && apk add --no-cache --virtual .permanent-dependencies \
+    postgresql-dev jpeg-dev zlib-dev bash \
+    && pip install --upgrade pip \
+    && pip install --requirement requirements.txt \
+    && apk del .removable-dependencies
 
-# Upgrade pip, if an upgrade is out
-RUN ["pip", "install", "--upgrade", "pip"]
-
-# Install packages listed in requirements.txt
-RUN ["pip", "install", "--requirement", "requirements.txt"]
+# RUN ["pip", "install", "--upgrade", "pip"]
+# RUN ["pip", "install", "--requirement", "requirements.txt"]
