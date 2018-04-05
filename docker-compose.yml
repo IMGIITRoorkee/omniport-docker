@@ -70,13 +70,18 @@ services:
       - environment/base.env
       - environment/sites/intranet.env
 
-    # Expose the port 8001 used by Gunicorn to other containers
+    # Expose the ports 8001 and 8003 used by Gunicorn and Daphne to other containers
     expose:
       - "8001"
       - "8003"
 
+    # Expose the ports 8001 and 8003 to the host
+    ports:
+      - "8001:8001"
+      - "8003:8003"
+
     # Change the port to ensure that each site runs on its own port
-    command: bash -c "gunicorn -b 0.0.0.0:8001 --reload omniport.wsgi"
+    command: bash -c "daphne -b 0.0.0.0 -p 8003 omniport.asgi:application & gunicorn -b 0.0.0.0:8001 --reload omniport.wsgi"
 
     # We mount the volumes on the Gunicorn container
     volumes:
@@ -113,13 +118,18 @@ services:
       - environment/base.env
       - environment/sites/internet.env
 
-    # Expose the port 8002 used by Gunicorn to other containers
+    # Expose the ports 8002 and 8004 used by Gunicorn and Daphne to other containers
     expose:
       - "8002"
       - "8004"
 
+    # Expose the ports 8002 and 8004 to the host
+    ports:
+      - "8002:8002"
+      - "8004:8004"
+
     # Change the port to ensure that each site runs on its own port
-    command: bash -c "gunicorn -b 0.0.0.0:8002 --reload omniport.wsgi"
+    command: bash -c "daphne -b 0.0.0.0 -p 8004 omniport.asgi:application & gunicorn -b 0.0.0.0:8002 --reload omniport.wsgi"
 
     # We mount the volumes on the Gunicorn container
     volumes:
