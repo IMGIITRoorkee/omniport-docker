@@ -87,6 +87,9 @@ services:
     volumes:
       # Mount the code from the 'omniport' folder in the root of the container 
       - ./omniport:/omniport
+
+      # Mount the images from logos into the static folder in Omniport
+      - ./logos:/omniport/omniport/static/omniport/logos
       
       # Mount 'media' as its namesake in the root of the container
       - media:/media
@@ -135,6 +138,9 @@ services:
     volumes:
       # Mount the code from the 'omniport' folder in the root of the container 
       - ./omniport:/omniport
+
+      # Mount the images from logos into the static folder in Omniport
+      - ./logos:/omniport/omniport/static/omniport/logos
       
       # Mount 'media' as its namesake in the root of the container
       - media:/media
