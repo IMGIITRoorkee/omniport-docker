@@ -4,14 +4,14 @@ FROM python:alpine
 # Add labels for metadata
 LABEL maintainer="Dhruv Bhanushali <https://dhruvkb.github.io/>"
 
-# Expose port 8000 on which Gunicorn serves the Django application
-EXPOSE 8000
-
 # Define environment variables
 ENV PYTHONPATH="/omniport:/omniport/apps:/omniport/services"
 
 # Work in the root directory of the container
 WORKDIR /
+
+# Copy the supervisord.conf file over to the container
+COPY ./django/supervisord.conf ./supervisord.conf
 
 # Copy the requirements.txt file over to the container
 # This command implies an image rebuild when requirements.txt changes
@@ -23,10 +23,9 @@ RUN apk update \
     && apk add --no-cache --virtual .removable-dependencies \
     build-base gcc libffi-dev musl-dev \
     && apk add --no-cache --virtual .permanent-dependencies \
-    postgresql-dev jpeg-dev zlib-dev bash \
+    postgresql-dev jpeg-dev zlib-dev supervisor \
     && pip install --upgrade pip \
     && pip install --requirement requirements.txt \
     && apk del .removable-dependencies
 
-# RUN ["pip", "install", "--upgrade", "pip"]
-# RUN ["pip", "install", "--requirement", "requirements.txt"]
+WORKDIR /omniport

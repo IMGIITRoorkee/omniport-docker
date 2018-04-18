@@ -81,7 +81,7 @@ services:
       - "8003:8003"
 
     # Change the port to ensure that each site runs on its own port
-    command: bash -c "daphne -b 0.0.0.0 -p 8003 omniport.asgi:application & gunicorn -b 0.0.0.0:8001 --reload omniport.wsgi"
+    command: ["/usr/bin/supervisord", "-c", "/supervisord.conf"]
 
     # We mount the volumes on the Gunicorn container
     volumes:
@@ -131,8 +131,7 @@ services:
       - "8002:8002"
       - "8004:8004"
 
-    # Change the port to ensure that each site runs on its own port
-    command: bash -c "daphne -b 0.0.0.0 -p 8004 omniport.asgi:application & gunicorn -b 0.0.0.0:8002 --reload omniport.wsgi"
+    command: ["/usr/bin/supervisord", "-c", "/supervisord.conf"]
 
     # We mount the volumes on the Gunicorn container
     volumes:
