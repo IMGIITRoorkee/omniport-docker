@@ -89,7 +89,7 @@ services:
       - ./omniport:/omniport
 
       # Mount the images from logos into the static folder in Omniport
-      - ./logos:/omniport/omniport/static/omniport/logos
+      - ./branding:/omniport/omniport/static/omniport/branding
       
       # Mount 'media' as its namesake in the root of the container
       - media:/media
@@ -139,7 +139,7 @@ services:
       - ./omniport:/omniport
 
       # Mount the images from logos into the static folder in Omniport
-      - ./logos:/omniport/omniport/static/omniport/logos
+      - ./branding:/omniport/omniport/static/omniport/branding
       
       # Mount 'media' as its namesake in the root of the container
       - media:/media

@@ -11,6 +11,6 @@ environment/sites/*
 !environment/sites/site-stencil.env
 
 # Ignore trhe logos of the portal, institute and maintainers
-logos/*
+branding/*
 # ... but commit the README.md file
-!logos/README.md
+!branding/README.md
