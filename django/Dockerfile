@@ -4,14 +4,8 @@ FROM python:alpine
 # Add labels for metadata
 LABEL maintainer="Dhruv Bhanushali <https://dhruvkb.github.io/>"
 
-# Define environment variables
-ENV PYTHONPATH="/omniport:/omniport/apps:/omniport/services"
-
 # Work in the root directory of the container
 WORKDIR /
-
-# Copy the supervisord.conf file over to the container
-COPY ./django/supervisord.conf ./supervisord.conf
 
 # Copy the requirements.txt file over to the container
 # This command implies an image rebuild when requirements.txt changes
@@ -28,4 +22,8 @@ RUN apk update \
     && pip install --requirement requirements.txt \
     && apk del .removable-dependencies
 
-WORKDIR /omniport
+# Copy the supervisord.conf file over to the container
+COPY ./django/supervisord.conf ./supervisord.conf
+
+# Define environment variables
+ENV PYTHONPATH="/omniport:/omniport/apps:/omniport/services"
