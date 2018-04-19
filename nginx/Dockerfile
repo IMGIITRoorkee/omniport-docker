@@ -4,9 +4,6 @@ FROM nginx:alpine
 # Add labels for metadata
 LABEL maintainer="Dhruv Bhanushali <https://dhruvkb.github.io/>"
 
-# Expose port 80 and 443 on which NGINX serves HTTP and HTTPS respectively
-EXPOSE 80 443
-
 # Change the working directory
 WORKDIR /etc/nginx
 
