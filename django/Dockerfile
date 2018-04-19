@@ -25,5 +25,8 @@ RUN apk update \
 # Copy the supervisord.conf file over to the container
 COPY ./django/supervisord.conf ./supervisord.conf
 
+# Copy the gunicorn_config.py file over to the container
+COPY ./django/gunicorn_config.py ./gunicorn_config.py
+
 # Define environment variables
 ENV PYTHONPATH="/omniport:/omniport/apps:/omniport/services"
