@@ -17,7 +17,8 @@ This Dockerised setup is the preferred mode of installation.
 ## Instructions
 
 - Run the following scripts _from the root folder_, in this order
-    - `clone.sh`
+    - `clone/core.sh`
+    - `clone/shell.sh` (optional; if you want the IIT Roorkee customisations)
     - `build-django.sh`
     - `build-nginx.sh`
 - Run `docker-compose up`
