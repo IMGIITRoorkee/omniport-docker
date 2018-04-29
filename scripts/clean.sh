@@ -1,4 +1,4 @@
 #!/bin/sh
 
-# Remove the InstiPort directory if it exists
+# Remove the Omniport directory if it exists
 rm -rf omniport
