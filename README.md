@@ -19,8 +19,8 @@ This Dockerised setup is the preferred mode of installation.
 - Run the following scripts _from the root folder_, in this order
     - `clone/core.sh`
     - `clone/shell.sh` (optional; if you want the IIT Roorkee customisations)
-    - `build-django.sh`
-    - `build-nginx.sh`
+    - `build/django.sh`
+    - `build/nginx.sh`
 - Run `docker-compose up`
 - If this is your first run, enter `docker-compose exec <django-container> /bin/bash` and then run the following `manage.py` commands
     - `collectstatic`
