@@ -10,9 +10,12 @@ services:
     restart: always
 
     # Expose the port 5432 used by PostgreSQL to other containers
-    # This port is not exposed to the host
     expose:
       - "5432"
+
+    # Expose the port 5432 used by PostgreSQL to the host
+    ports:
+      - "5432:5432"
 
     # Set the environment variables
     env_file:
@@ -38,9 +41,12 @@ services:
       - environment/base.env
 
     # Expose the port 6379 used by Redis to other containers
-    # This port is not exposed to the host
     expose:
       - "6379"
+
+    # Export the port 6379 used by Redis to the host at 6380
+    ports:
+      - "6380:6379"
 
   session-store: # Redis
     # Use the Redis image from Alpine Linux as is
@@ -54,9 +60,12 @@ services:
       - environment/base.env
 
     # Expose the port 6379 used by Redis to other containers
-    # This port is not exposed to the host
     expose:
       - "6379"
+
+    # Expose the port 6379 used by Redis to the host at 6381
+    ports:
+      - "6381:6379"
 
   intranet-server: # Gunicorn + Daphne
     # Use the Django image we made ourselves by running ./scripts/build_django.sh
