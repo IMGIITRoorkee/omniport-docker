@@ -1,7 +1,6 @@
 import os
 
-port = os.getenv('GUNICORN_PORT')
-bind = f'0.0.0.0:{port}'
+bind = '0.0.0.0:8000'
 
 reload = True
 
