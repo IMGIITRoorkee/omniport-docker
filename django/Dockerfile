@@ -29,4 +29,4 @@ COPY ./django/supervisord.conf ./supervisord.conf
 COPY ./django/gunicorn_config.py ./gunicorn_config.py
 
 # Define environment variables
-ENV PYTHONPATH="/omniport:/omniport/apps:/omniport/services"
+ENV PYTHONPATH="/omniport:/omniport/core:/omniport/services:/omniport/apps"
