@@ -1,0 +1,136 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$ref": "#/definitions/BaseConfiguration",
+    "definitions": {
+        "BaseConfiguration": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "branding": {
+                    "$ref": "#/definitions/Branding"
+                },
+                "i18n": {
+                    "$ref": "#/definitions/I18N"
+                },
+                "database": {
+                    "$ref": "#/definitions/Postgres"
+                },
+                "channelLayer": {
+                    "$ref": "#/definitions/Redis"
+                },
+                "sessionStore": {
+                    "$ref": "#/definitions/Redis"
+                },
+                "secretKey": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "branding",
+                "channelLayer",
+                "database",
+                "i18n",
+                "secretKey",
+                "sessionStore"
+            ],
+            "title": "BaseConfiguration"
+        },
+        "Branding": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "institute": {
+                    "$ref": "#/definitions/Brand"
+                },
+                "maintainers": {
+                    "$ref": "#/definitions/Brand"
+                }
+            },
+            "required": [
+                "institute",
+                "maintainers"
+            ],
+            "title": "Branding"
+        },
+        "Brand": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "homePage": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "homePage",
+                "name"
+            ],
+            "title": "Brand"
+        },
+        "Redis": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "host": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "host",
+                "port"
+            ],
+            "title": "Redis"
+        },
+        "Postgres": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "host": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "user": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "host",
+                "name",
+                "password",
+                "port",
+                "user"
+            ],
+            "title": "Postgres"
+        },
+        "I18N": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "languageCode": {
+                    "type": "string"
+                },
+                "timeZone": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "languageCode",
+                "timeZone"
+            ],
+            "title": "I18N"
+        }
+    }
+}

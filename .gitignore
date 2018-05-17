@@ -2,13 +2,14 @@
 omniport/
 omniport
 
-# Base-level environment file
-environment/base.env
+# Database environment file
+postgres/database.env
 
-# Ignore the site-specific environment files
-environment/sites/*
-# ... but commit README.md and the stencil for the site-specific environment files
-!environment/sites/site-stencil.env
+# Ignore the base JSON configuration file
+configuration/base.json
+
+# Ignore the site-specific JSON configuration files
+configuration/sites/site_*.json
 
 # Ignore trhe logos of the portal, institute and maintainers
 branding/*

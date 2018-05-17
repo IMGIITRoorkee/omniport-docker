@@ -12,15 +12,9 @@ docker run \
 	--tty \
 	--interactive \
 	--net="host" \
-	--env-file $PWD/environment/base.env \
-	--env-file $PWD/environment/sites/intranet.env \
-	--env DATABASE_HOST=127.0.0.1 \
-	--env DATABASE_PORT=5432 \
-	--env CHANNEL_LAYER_HOST=127.0.0.1 \
-	--env CHANNEL_LAYER_PORT=6380 \
-	--env SESSION_STORE_HOST=127.0.0.1 \
-	--env SESSION_STORE_PORT=6381 \
+	--env SITE_ID=0 \
 	--mount type=bind,src=$PWD/omniport,dst=/omniport \
+	--mount type=bind,src=$PWD/configuration,dst=/omniport/configuration \
 	--mount type=bind,src=$PWD/branding,dst=/omniport/omniport/static/omniport/branding \
 	omniport-django:latest \
 	python /omniport/manage.py runserver $PORT

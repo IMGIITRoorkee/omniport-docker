@@ -19,7 +19,7 @@ services:
 
     # Set the environment variables
     env_file:
-    - environment/base.env
+    - postgres/database.env
 
     # Mount the volumes on the database container
     volumes:
@@ -36,10 +36,6 @@ services:
     # No matter what, if the container stops, start it again
     restart: always
 
-    # Set the environment variables
-    env_file:
-      - environment/base.env
-
     # Expose the port 6379 used by Redis to other containers
     expose:
       - "6379"
@@ -54,10 +50,6 @@ services:
 
     # No matter what, if the container stops, start it again
     restart: always
-
-    # Set the environment variables
-    env_file:
-      - environment/base.env
 
     # Expose the port 6379 used by Redis to other containers
     expose:
@@ -74,11 +66,6 @@ services:
     # No matter what, if the container stops, start it again
     restart: always
 
-    # Set the environment variables
-    env_file:
-      - environment/base.env
-      - environment/sites/intranet.env
-
     # Expose the ports 8000 and 8001 used by Gunicorn and Daphne to other containers
     expose:
       - "8000"
@@ -88,6 +75,10 @@ services:
     ports:
       - "8001:8000"
       - "8002:8001"
+
+    # Set the SITE_ID environment variable so that the right JSON may be processed
+    environment:
+      - SITE_ID=1
 
     # Change the port to ensure that each site runs on its own port
     command: ["/usr/bin/supervisord", "-c", "/supervisord.conf"]
@@ -99,6 +90,9 @@ services:
 
       # Mount the images from logos into the static folder in Omniport
       - ./branding:/omniport/omniport/static/omniport/branding
+
+      # Mount the JSON configuration files into the configuration folder in Omniport
+      - ./configuration:/omniport/configuration
       
       # Mount 'media' as its namesake in the root of the container
       - media:/media
@@ -125,11 +119,6 @@ services:
     # No matter what, if the container stops, start it again
     restart: always
 
-    # Set the environment variables
-    env_file:
-      - environment/base.env
-      - environment/sites/internet.env
-
     # Expose the ports 8000 and 8001 used by Gunicorn and Daphne to other containers
     expose:
       - "8000"
@@ -140,6 +129,10 @@ services:
       - "8003:8000"
       - "8004:8001"
 
+    # Set the SITE_ID environment variable so that the right JSON may be processed
+    environment:
+      - SITE_ID=2
+
     command: ["/usr/bin/supervisord", "-c", "/supervisord.conf"]
 
     # We mount the volumes on the Gunicorn container
@@ -149,6 +142,9 @@ services:
 
       # Mount the images from logos into the static folder in Omniport
       - ./branding:/omniport/omniport/static/omniport/branding
+
+      # Mount the JSON configuration files into the configuration folder in Omniport
+      - ./configuration:/omniport/configuration
       
       # Mount 'media' as its namesake in the root of the container
       - media:/media
@@ -174,10 +170,6 @@ services:
 
     # No matter what, if the container stops, start it again
     restart: always
-
-    # Set the environment variables
-    env_file:
-      - environment/base.env
 
     # Expose the port 80 and 443 used by NGINX to other containers
     expose:
