@@ -17,6 +17,12 @@
                     "items": {
                         "type": "string"
                     }
+                },
+                "allowedApps": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 }
             },
             "required": [
