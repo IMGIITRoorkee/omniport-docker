@@ -3,8 +3,8 @@
 # Get the current working directory
 PWD=$(pwd)
 
-# Get the port on which to run the development server, defaults to 8000
-PORT=$1
+# Get the interface and port to bind to, defaults to 0.0.0.0:8000
+BIND=${1:-'0.0.0.0:8000'}
 
 # Run the container with the specified settings
 # Start the DJ!
@@ -17,4 +17,4 @@ docker run \
 	--mount type=bind,src=$PWD/configuration,dst=/omniport/configuration \
 	--mount type=bind,src=$PWD/branding,dst=/omniport/omniport/static/omniport/branding \
 	omniport-django:latest \
-	python /omniport/manage.py runserver $PORT
+	python /omniport/manage.py runserver $BIND
