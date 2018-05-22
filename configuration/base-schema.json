@@ -21,6 +21,12 @@
                 "sessionStore": {
                     "$ref": "#/definitions/Redis"
                 },
+                "ipAddressPatterns": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/IPAddressPattern"
+                    }
+                },
                 "secretKey": {
                     "type": "string"
                 }
@@ -131,6 +137,26 @@
                 "timeZone"
             ],
             "title": "I18N"
+        },
+        "IPAddressPattern": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "ringName": {
+                    "type": "string"
+                },
+                "patterns": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "required": [
+                "patterns",
+                "ringName"
+            ],
+            "title": "IPAddressPattern"
         }
     }
 }
