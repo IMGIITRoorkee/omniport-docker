@@ -5,6 +5,9 @@ omniport
 # Database environment file
 postgres/database.env
 
+# Message broker environment file
+rabbitmq/message_broker.env
+
 # Ignore the base JSON configuration file
 configuration/base.yml
 

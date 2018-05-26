@@ -59,6 +59,26 @@ services:
     ports:
       - "6381:6379"
 
+  message-broker: # RabbitMQ
+    # Use the RabbitMQ image from Alpine Linux as is
+    image: rabbitmq:management-alpine
+
+    # No matter what, if the container stops, start it again
+    restart: always
+
+    # Expose the port 5672 used by RabbitMQ to other containers
+    expose:
+      - "5672"
+
+    # Expose the ports 5672 and 15672 to the host at 5672 and 15672
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    
+    # Set the environment variables
+    env_file:
+    - rabbitmq/message_broker.env
+
   intranet-server: # Gunicorn + Daphne
     # Use the Django image we made ourselves by running ./scripts/build_django.sh
     image: omniport-django:latest
