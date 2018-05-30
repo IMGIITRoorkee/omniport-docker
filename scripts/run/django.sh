@@ -16,5 +16,6 @@ docker run \
 	--mount type=bind,src=$PWD/omniport,dst=/omniport \
 	--mount type=bind,src=$PWD/configuration,dst=/omniport/configuration \
 	--mount type=bind,src=$PWD/branding,dst=/omniport/omniport/static/omniport/branding \
+	--mount type=volume,src=omniportdocker_media,dst=/media \
 	omniport-django:latest \
 	python /omniport/manage.py runserver $BIND
