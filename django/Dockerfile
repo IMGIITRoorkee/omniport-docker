@@ -6,7 +6,7 @@ LABEL maintainer="Dhruv Bhanushali <https://dhruvkb.github.io/>"
 
 # Install dependencies
 RUN apt-get update \
-    && apt-get install --no-install-recommends -y gcc supervisor \
+    && apt-get install -y gcc supervisor \
     && rm -rf /var/lib/apt/lists/*
 
 # Work in the root directory of the container
