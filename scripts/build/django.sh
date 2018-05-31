@@ -1,4 +1,13 @@
 #!/bin/sh
 
+# Copy the requirements file from the codebase into the Django Docker folder
+cp omniport/requirements.txt django/
+
+# Enter the Django Docker folder
+cd django/
+
 # Build the container from the django folder and tag it
-docker build --file django/Dockerfile --tag omniport-django .
+docker build --tag omniport-django .
+
+# Remove the requirements file after it has served its purpose
+rm requirements.txt
