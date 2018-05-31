@@ -1,32 +1,30 @@
-# Use Python from the Alpine Linux project
-FROM python:alpine
+# Use Python from the Debian Linux project
+FROM python:slim-stretch
 
 # Add labels for metadata
 LABEL maintainer="Dhruv Bhanushali <https://dhruvkb.github.io/>"
+
+# Install dependencies
+RUN apt-get update \
+    && apt-get install --no-install-recommends -y gcc supervisor \
+    && rm -rf /var/lib/apt/lists/*
 
 # Work in the root directory of the container
 WORKDIR /
 
 # Copy the requirements.txt file over to the container
 # This command implies an image rebuild when requirements.txt changes
-COPY ./omniport/requirements.txt ./requirements.txt
+COPY ./requirements.txt ./requirements.txt
 
-# Install dependencies
-RUN apk update \
-    && apk upgrade \
-    && apk add --no-cache --virtual .removable-dependencies \
-    build-base gcc libffi-dev musl-dev \
-    && apk add --no-cache --virtual .permanent-dependencies \
-    postgresql-dev jpeg-dev zlib-dev supervisor \
-    && pip install --upgrade pip \
-    && pip install --requirement requirements.txt \
-    && apk del .removable-dependencies
+# Install pip packages
+RUN pip install --upgrade pip \
+    && pip install --requirement requirements.txt
 
 # Copy the supervisord.conf file over to the container
-COPY ./django/supervisord.conf ./supervisord.conf
+COPY ./supervisord.conf ./supervisord.conf
 
 # Copy the gunicorn_config.py file over to the container
-COPY ./django/gunicorn_config.py ./gunicorn_config.py
+COPY ./gunicorn_config.py ./gunicorn_config.py
 
 # Define environment variables
 ENV PYTHONPATH="/omniport:/omniport/core:/omniport/services:/omniport/apps"
