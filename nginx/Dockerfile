@@ -12,4 +12,4 @@ RUN rm -f ./conf.d/default.conf
 
 # Load the configurations from the supplied conf.d directory in its place
 # There should be as many .conf files as the number of sites you want to run
-ADD ./nginx/conf.d ./conf.d
+ADD ./conf.d ./conf.d
