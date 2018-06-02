@@ -80,7 +80,7 @@ services:
     - rabbitmq/message_broker.env
 
   intranet-server: # Gunicorn + Daphne
-    # Use the Django image we made ourselves by running ./scripts/build_django.sh
+    # Use the Django image we made ourselves by running ./scripts/build/django.sh
     image: omniport-django:latest
 
     # No matter what, if the container stops, start it again
@@ -131,9 +131,10 @@ services:
       - database
       - channel-layer
       - session-store
+      - message-broker
 
   internet-server: # Gunicorn + Daphne
-    # Use the Django image we made ourselves by running ./scripts/build_django.sh
+    # Use the Django image we made ourselves by running ./scripts/build/django.sh
     image: omniport-django:latest
 
     # No matter what, if the container stops, start it again
@@ -183,9 +184,10 @@ services:
       - database
       - channel-layer
       - session-store
+      - message-broker
 
   reverse-proxy: # NGINX
-    # Use the NGINX image we made ourselves by running ./scripts/build_nginx.sh
+    # Use the NGINX image we made ourselves by running ./scripts/build/nginx.sh
     image: omniport-nginx:latest
 
     # No matter what, if the container stops, start it again
@@ -230,6 +232,9 @@ volumes:
   daphne_logs:
   # This volume contains NGINX logs
   nginx_logs:
+
+  # This volume contains the production build of all frontend apps
+  frontend:
 
   # This volume contains the media files
   media:
