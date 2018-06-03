@@ -21,6 +21,10 @@ channelLayer:
 sessionStore:
   host: # session-store, or your own server configuration
   port: # 6379, or your own server configuration
+messageBroker:
+  host: # message-broker, or your own server configuration
+  user: # Same as message_broker.env, or your own server configuration
+  password: # Same as message_broker.env, or your own server configuration
 secretKey: '' # 'fifty random characters'
 ipAddressPatterns:
   # For as many rings as you anticipate, repeat
