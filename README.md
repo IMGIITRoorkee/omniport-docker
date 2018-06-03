@@ -11,30 +11,50 @@ This is the official Docker distribution of Omniport. Do note that although ever
 - Reverse proxy: `NGINX`
 - WSGI server: `Gunicorn`
 - ASGI server: `Daphne`
-- Database: `PostgreSQL` + `Psycopg2`
+- Database: `PostgreSQL`
 
 This Dockerised setup is the preferred mode of installation.
 
 ## Instructions
 
-The following instructions should get your system up and running in no time at all!
+The following instructions should get your system up and running in no time at all! Unless otherwise specified, all commands must be run from the root directory. That means the directory containing this `README.md` file.
 
 ### Cloning repositories
 
 Clone the repositories using the scripts in `./scripts/clone`. Go in the specified order.
 
-- Clone the core: `omniport-core`
-- Clone the shell (for IIT Roorkee only): `omniport-shell`
-- Clone all the services: `omniport-service-*`
-- Clone only the apps you want: `omniport-app-*`
+- Clone the core: `./scripts/clone/core.sh`
+- Clone the shell (for IIT Roorkee only): `./scripts/clone/shell.sh`
+- Clone all the services: `./scripts/clone/services.sh`
+- Clone only the apps you want: `git clone https://github.com/IMGIITRoorkee/omniport-app-xyz.git xyz` (*or over SSH if you prefer that*)
 
 ### Populating env vars
 
-This section is under development because of an impending plan to shift away from environment variables to JSON configuration files.
+The configuration for the project is divided into 3 parts:
+
+- **Message broker, `RabbitMQ`**:
+    - Enter the RabbitMQ directory: `cd rabbitmq`
+    - Create `database.env` from `database_stencil.env` and populate the database name, username and password.
+- **Database, `PostgreSQL`**:
+    - Enter the PostgreSQL directory: `cd postgres`
+    - Create `message_broker.env` from `message_broker_stencil.env` and populate the message-broker username and password.
+- **Web servers, `Gunicorn` and `Daphne`**:
+    - Enter the YAML configuration files directory: `cd configuration`
+    - Create `base.yml` from `base_stencil.yml`.
+    - Enter the site-specific YAML configuration files directory: `cd sites`
+    - For every site that is being run, create `site_<site_id>.yml` from `site_stencil.yml`.
+    - You can override settings defined in `base.yml` by redefining them in `site_<site_id>.yml`.
+    - If you are using the complete Docker setup, ensure that you use the same values defined in the `*.env` files from `postgres/` and `rabbitmq/`.
+    
+    | Site ID   | Purpose                                                   |
+    |-----------|-----------------------------------------------------------|
+    | 0         | Omniport Development, used by `./scripts/run/django.sh`   |
+    | 1         | Omniport Intranet, the portal used on the Intranet        |
+    | 2         | Omniport Internet, the portal used on the Internet        |
 
 ### Building containers
 
-Since the `Django` and `NGINX` contains have been significantly modified from their base versions, they need to be built.
+Since the `Django` and `NGINX` containers have been significantly modified from their base versions, they need to be built.
 
 - Build the `Django` container: `./scripts/build/django.sh`
 - Build the `NGINX` container: `./scripts/build/nginx.sh` 
@@ -44,7 +64,7 @@ Since the `Django` and `NGINX` contains have been significantly modified from th
 After building Docker containers, they need to be launched or *upped*.
 
 - **Development**:
-    - Launch all containers except `Django` and `NGINX`: `docker-compose up -d database session-store channel-layer`
+    - Launch all containers except `Django` and `NGINX`: `docker-compose up -d database session-store channel-layer message-broker`
     - Launch the `Django` development container: `./scripts/run/start-the-dj.sh`
 - **Production**:
     - Just launch the entire system: `docker-compose up`
@@ -56,9 +76,9 @@ For Django to become fully functional, a number of first time as well as periodi
 - Enter the shell on the Django container.
     - **Development:** 
         - Find the ID of the Django container: `docker ps`
-        - Enter the shell on the container: `docker exec <container_id> sh`
+        - Enter the shell on the container: `docker exec <container_name> bash`
     - **Production:**
-        - Enter the shell on the container: `docker-compose exec intranet-server sh`
+        - Enter the shell on the container: `docker-compose exec intranet-server bash`
 - Enter the Omniport directory: `cd omniport`
 - Run all the `manage.py` commands you need.
     - `collectstatic`
