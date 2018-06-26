@@ -4,6 +4,13 @@ FROM nginx:alpine
 # Add labels for metadata
 LABEL maintainer="Dhruv Bhanushali <https://dhruvkb.github.io/>"
 
+# Work in the root directory of the container
+WORKDIR /
+
+# Create the logging volume
+RUN mkdir -p /reverse_proxy_logs/nginx_logs && chown -R nginx:nginx /reverse_proxy_logs
+VOLUME /reverse_proxy_logs
+
 # Change the working directory
 WORKDIR /etc/nginx
 

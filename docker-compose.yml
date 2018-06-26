@@ -117,14 +117,8 @@ services:
       # Mount 'media' as its namesake in the root of the container
       - media:/media
 
-      # Mount 'media_backup' as its namesake in the root of the container
-      - media_backup:/media_backup
-
-      # Mount 'gunicorn_logs' as its namesake in the root of the container
-      - gunicorn_logs:/gunicorn_logs
-
-      # Mount 'daphne_logs' as its namesake in the root of the container
-      - daphne_logs:/daphne_logs
+      # Mount 'web_server_logs' as its namesake in the root of the container
+      - web_server_logs:/web_server_logs
 
     # The services that need to be ready before this one
     depends_on:
@@ -170,14 +164,8 @@ services:
       # Mount 'media' as its namesake in the root of the container
       - media:/media
 
-      # Mount 'media_backup' as its namesake in the root of the container
-      - media_backup:/media_backup
-
-      # Mount 'gunicorn_logs' as its namesake in the root of the container
-      - gunicorn_logs:/gunicorn_logs
-
-      # Mount 'daphne_logs' as its namesake in the root of the container
-      - daphne_logs:/daphne_logs
+      # Mount 'web_server_logs' as its namesake in the root of the container
+      - web_server_logs:/web_server_logs
 
     # The services that need to be ready before this one
     depends_on:
@@ -211,8 +199,8 @@ services:
       # Mount 'media' as its namesake in the root of the container
       - media:/media
 
-      # Mount 'nginx_logs' as its namesake in the root of the container
-      - nginx_logs:/nginx_logs
+      # Mount 'reverse_proxy_logs' as its namesake in the root of the container
+      - reverse_proxy_logs:/reverse_proxy_logs
 
     # The services that need to be ready before this one
     depends_on:
@@ -226,12 +214,10 @@ volumes:
   # This volume contains periodic dumps of the database for backup
   database_backup:
 
-  # This volume contains Gunicorn logs
-  gunicorn_logs:
-  # This volume contains Daphne logs
-  daphne_logs:
-  # This volume contains NGINX logs
-  nginx_logs:
+  # This volume contains reverse proxy logs
+  reverse_proxy_logs:
+  # This volume contains web server logs
+  web_server_logs:
 
   # This volume contains the production build of all frontend apps
   frontend:
