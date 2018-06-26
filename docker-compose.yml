@@ -13,9 +13,8 @@ services:
     expose:
       - "5432"
 
-    # Expose the port 5432 used by PostgreSQL to the host
-    ports:
-      - "5432:5432"
+    # Run the container as the non-root user
+    user: postgres
 
     # Set the environment variables
     env_file:
@@ -25,9 +24,6 @@ services:
     volumes:
       # Mount 'database' as the place where PostgreSQL stores all its data
       - database:/var/lib/postgresql/data
-
-      # Mount 'database_backup' as its namesake in the root of the container
-      - database_backup:/database_backup
 
   channel-layer: # Redis
     # Use the Redis image from Alpine Linux as is
@@ -40,9 +36,8 @@ services:
     expose:
       - "6379"
 
-    # Export the port 6379 used by Redis to the host at 6380
-    ports:
-      - "6380:6379"
+    # Run the container as the non-root user
+    user: redis
 
   session-store: # Redis
     # Use the Redis image from Alpine Linux as is
@@ -55,9 +50,8 @@ services:
     expose:
       - "6379"
 
-    # Expose the port 6379 used by Redis to the host at 6381
-    ports:
-      - "6381:6379"
+    # Run the container as the non-root user
+    user: redis
 
   message-broker: # RabbitMQ
     # Use the RabbitMQ image from Alpine Linux as is
@@ -70,10 +64,12 @@ services:
     expose:
       - "5672"
 
-    # Expose the ports 5672 and 15672 to the host at 5672 and 15672
+    # Expose the ports 15672 to the host at 5672 and 15672
     ports:
-      - "5672:5672"
       - "15672:15672"
+
+    # Run the container as the non-root user
+    user: rabbitmq
     
     # Set the environment variables
     env_file:
@@ -91,10 +87,8 @@ services:
       - "8000"
       - "8001"
 
-    # Expose the ports 8001 and 8002 to the host at 8001 and 8002
-    ports:
-      - "8001:8000"
-      - "8002:8001"
+    # Run the container as the non-root user
+    user: django
 
     # Set the SITE_ID environment variable so that the right JSON may be processed
     environment:
@@ -139,10 +133,8 @@ services:
       - "8000"
       - "8001"
 
-    # Expose the ports 8000 and 8001 to the host at 8003 and 8004
-    ports:
-      - "8003:8000"
-      - "8004:8001"
+    # Run the container as the non-root user
+    user: django
 
     # Set the SITE_ID environment variable so that the right JSON may be processed
     environment:
@@ -193,7 +185,7 @@ services:
 
     # Mount the volumes on the NGINX container
     volumes:
-      # Mount the code from the 'instiport' folder in the root of the container 
+      # Mount the code from the 'omniport' folder in the root of the container 
       - ./omniport:/omniport
 
       # Mount 'media' as its namesake in the root of the container
