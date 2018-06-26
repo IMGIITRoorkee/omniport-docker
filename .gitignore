@@ -1,3 +1,6 @@
+# IntelliJ configuration
+.idea/
+
 # Cloned codebase
 omniport/
 omniport
