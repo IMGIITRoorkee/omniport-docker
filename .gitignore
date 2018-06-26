@@ -1,6 +1,9 @@
 # IntelliJ configuration
 .idea/
 
+# VSCode configuration
+.vscode/
+
 # Cloned codebase
 omniport/
 omniport
