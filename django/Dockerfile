@@ -4,6 +4,9 @@ FROM python:slim-stretch
 # Add labels for metadata
 LABEL maintainer="Dhruv Bhanushali <https://dhruvkb.github.io/>"
 
+# Create a non-root user
+RUN groupadd --system django && useradd --system --gid django django
+
 # Install dependencies
 RUN apt-get update \
     && apt-get install -y gcc supervisor \
@@ -19,6 +22,13 @@ COPY ./requirements.txt ./requirements.txt
 # Install pip packages
 RUN pip install --upgrade pip \
     && pip install --requirement requirements.txt
+
+# Create the logging volume
+RUN mkdir -p /web_server_logs/supervisord_logs/ \
+    && mkdir -p /web_server_logs/gunicorn_logs/ \
+    && mkdir -p /web_server_logs/daphne_logs/ \
+    && chown -R django:django /web_server_logs
+VOLUME /web_server_logs
 
 # Copy the supervisord.conf file over to the container
 COPY ./supervisord.conf ./supervisord.conf
