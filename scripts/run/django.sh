@@ -15,12 +15,13 @@ docker run \
 	--tty \
 	--interactive \
 	--rm \
-	--net="host" \
-	--name=$NAME \
-	--env SITE_ID=0 \
+    --user=django:django \
+	--network=omniport-docker_default \
 	--mount type=bind,src=$PWD/omniport,dst=/omniport \
 	--mount type=bind,src=$PWD/configuration,dst=/omniport/configuration \
 	--mount type=bind,src=$PWD/branding,dst=/omniport/omniport/static/omniport/branding \
 	--mount type=volume,src=omniportdocker_media,dst=/media \
+	--name=$NAME \
+	--env SITE_ID=0 \
 	omniport-django:latest \
 	python /omniport/manage.py runserver $BIND

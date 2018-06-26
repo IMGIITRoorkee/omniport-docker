@@ -12,10 +12,9 @@ docker run \
 	--tty \
 	--interactive \
 	--rm \
-	--net="host" \
+	--network=omniport-docker_default \
+	--mount type=volume,src=omniport-docker_reverse_proxy_logs,dst=/reverse_proxy_logs \
+    --mount type=volume,src=omniport-docker_web_server_logs,dst=/web_server_logs \
 	--name=$NAME \
-	--mount type=volume,src=omniportdocker_gunicorn_logs,dst=/gunicorn_logs \
-    --mount type=volume,src=omniportdocker_daphne_logs,dst=/daphne_logs \
-	--mount type=volume,src=omniportdocker_nginx_logs,dst=/nginx_logs \
 	alpine:latest \
 	sh
