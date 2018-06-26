@@ -19,6 +19,20 @@ This Dockerised setup is the preferred mode of installation.
 
 The following instructions should get your system up and running in no time at all! Unless otherwise specified, all commands must be run from the root directory. That means the directory containing this `README.md` file.
 
+### Installation
+
+You need to have Docker and Docker Compose installed on your system. Pro-tip: create the alias `dc=docker-compose` in your `.bashrc` file. 
+
+Then for additional security, and to emulate the setup I have on my machine, edit the file `/etc/docker/daemon.json` as follows. Create the file if it does not exist already. Learn about user namespace remapping to better understand what this change does.
+
+```json
+{
+	"userns-remap": "<user>"
+}
+```
+
+Note that `<user>` here refers to the user you will be running Docker as. This is most likely your non-root administrator (UID 1000 in most cases). Check out the files `/etc/subuid` and `etc/subgid` for a hint as to who this `<user>` is.
+
 ### Cloning repositories
 
 Clone the repositories using the scripts in `./scripts/clone`. Go in the specified order.
@@ -46,11 +60,11 @@ The configuration for the project is divided into 3 parts:
     - You can override settings defined in `base.yml` by redefining them in `site_<site_id>.yml`.
     - If you are using the complete Docker setup, ensure that you use the same values defined in the `*.env` files from `postgres/` and `rabbitmq/`.
     
-    | Site ID   | Purpose                                                   |
-    |-----------|-----------------------------------------------------------|
-    | 0         | Omniport Development, used by `./scripts/run/django.sh`   |
-    | 1         | Omniport Intranet, the portal used on the Intranet        |
-    | 2         | Omniport Internet, the portal used on the Internet        |
+    | Site ID | Purpose                                                 |
+    | ------- | ------------------------------------------------------- |
+    | 0       | Omniport Development, used by `./scripts/run/django.sh` |
+    | 1       | Omniport Intranet, the portal used on the Intranet      |
+    | 2       | Omniport Internet, the portal used on the Internet      |
 
 ### Building containers
 
