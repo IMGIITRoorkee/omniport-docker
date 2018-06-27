@@ -15,7 +15,7 @@ docker run \
 	--tty \
 	--interactive \
 	--rm \
-    --user=django:django \
+	--user=django:django \
 	--network=omniport-docker_default \
 	--mount type=bind,src=$PWD/omniport,dst=/omniport \
 	--mount type=bind,src=$PWD/configuration,dst=/omniport/configuration \

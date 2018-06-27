@@ -14,7 +14,7 @@ docker run \
 	--rm \
 	--network=omniport-docker_default \
 	--mount type=volume,src=omniport-docker_reverse_proxy_logs,dst=/reverse_proxy_logs \
-    --mount type=volume,src=omniport-docker_web_server_logs,dst=/web_server_logs \
+	--mount type=volume,src=omniport-docker_web_server_logs,dst=/web_server_logs \
 	--name=$NAME \
 	alpine:latest \
 	sh
