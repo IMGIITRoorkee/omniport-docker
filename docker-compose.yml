@@ -188,6 +188,9 @@ services:
       # Mount the code from the 'omniport' folder in the root of the container 
       - ./omniport:/omniport
 
+      # Mount 'frontend' as its namesake in the root of the container
+      - frontend:/frontend
+
       # Mount 'media' as its namesake in the root of the container
       - media:/media
 
