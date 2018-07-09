@@ -13,7 +13,7 @@ This is the official Docker distribution of Omniport. Do note that although ever
 - ASGI server: `Daphne`
 - Database: `PostgreSQL`
 
-This Dockerised setup is the preferred mode of installation.
+This Dockerised setup is the preferred mode of installation. You can however set all the components up yourself, after undergoing a reasonable amount of headbanging and physical and mental pain.
 
 ## Instructions
 
@@ -33,7 +33,11 @@ Then for additional security, and to emulate the setup I have on my machine, edi
 
 Note that `<user>` here refers to the user you will be running Docker as. This is most likely your non-root administrator (UID 1000 in most cases). Check out the files `/etc/subuid` and `etc/subgid` for a hint as to who this `<user>` is.
 
+Then change directory to `/home` and ensure that the home directory of `<user>` has world execute permissions on it. It most likely won't so, grant the permission: `chmod o+x <user>/`. The goal is to ensure that all directories above and leading upto the project have the `x` permission enabled.
+
 ### Cloning repositories
+
+Clone this repository itself into a folder preferably in your `~/Documents` or `/home/<user>` directory. Then change into `omniport-docker` and continue following the instructions. All commands must be executed from this directory, unless explicitly instructed otherwise.
 
 Clone the repositories using the scripts in `./scripts/clone`. Go in the specified order.
 
