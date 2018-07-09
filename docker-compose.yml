@@ -1,5 +1,5 @@
 # The version of the docker-compose standard being followed here
-version: '3'
+version: '3.2'
 
 # Services are groups of containers handling one aspect of the application
 services:
@@ -11,7 +11,7 @@ services:
 
     # Expose the port 5432 used by PostgreSQL to other containers
     expose:
-      - "5432"
+    - "5432"
 
     # Run the container as the non-root user
     user: postgres
@@ -23,7 +23,10 @@ services:
     # Mount the volumes on the database container
     volumes:
       # Mount 'database' as the place where PostgreSQL stores all its data
-      - database:/var/lib/postgresql/data
+    - type: volume
+      source: database
+      target: /var/lib/postgresql/data
+      read_only: false
 
   channel-layer: # Redis
     # Use the Redis image from Alpine Linux as is
@@ -34,7 +37,7 @@ services:
 
     # Expose the port 6379 used by Redis to other containers
     expose:
-      - "6379"
+    - "6379"
 
     # Run the container as the non-root user
     user: redis
@@ -48,7 +51,7 @@ services:
 
     # Expose the port 6379 used by Redis to other containers
     expose:
-      - "6379"
+    - "6379"
 
     # Run the container as the non-root user
     user: redis
@@ -62,11 +65,11 @@ services:
 
     # Expose the port 5672 used by RabbitMQ to other containers
     expose:
-      - "5672"
+    - "5672"
 
     # Expose the ports 15672 to the host at 5672 and 15672
     ports:
-      - "15672:15672"
+    - "15672:15672"
 
     # Run the container as the non-root user
     user: rabbitmq
@@ -75,7 +78,7 @@ services:
     env_file:
     - rabbitmq/message_broker.env
 
-  intranet-server: # Gunicorn + Daphne
+  intranet-server: # Django = Gunicorn + Daphne
     # Use the Django image we made ourselves by running ./scripts/build/django.sh
     image: omniport-django:latest
 
@@ -84,44 +87,65 @@ services:
 
     # Expose the ports 8000 and 8001 used by Gunicorn and Daphne to other containers
     expose:
-      - "8000"
-      - "8001"
+    - "8000"
+    - "8001"
 
     # Run the container as the non-root user
     user: django
 
     # Set the SITE_ID environment variable so that the right JSON may be processed
     environment:
-      - SITE_ID=1
+    - SITE_ID=1
 
     # Change the port to ensure that each site runs on its own port
     command: ["/usr/bin/supervisord", "-c", "/supervisord.conf"]
 
-    # We mount the volumes on the Gunicorn container
+    # Mount the volumes on the Django container
     volumes:
-      # Mount the code from the 'omniport' folder in the root of the container 
-      - ./omniport:/omniport
+    # Mount the code from the 'omniport' folder in the root of the container 
+    - type: bind
+      source: ./omniport
+      target: /omniport
+      read_only: true
 
-      # Mount the images from logos into the static folder in Omniport
-      - ./branding:/omniport/omniport/static/omniport/branding
+    # Mount the YAML files from the 'configuration' folder in the root of the container
+    - type: bind
+      source: ./configuration
+      target: /configuration
+      read_only: true
 
-      # Mount the JSON configuration files into the configuration folder in Omniport
-      - ./configuration:/omniport/configuration
+    # Mount the imagery from the 'branding' folder in the root of the container
+    - type: bind
+      source: ./branding
+      target: /branding
+      read_only: true
+
+    # Mount 'static_files' as its namesake in the root of the container
+    - type: volume
+      source: static_files
+      target: /static_files
+      read_only: false
       
-      # Mount 'media' as its namesake in the root of the container
-      - media:/media
+    # Mount 'media_files' as its namesake in the root of the container
+    - type: volume
+      source: media_files
+      target: /media_files
+      read_only: false
 
-      # Mount 'web_server_logs' as its namesake in the root of the container
-      - web_server_logs:/web_server_logs
+    # Mount 'web_server_logs' as its namesake in the root of the container
+    - type: volume
+      source: web_server_logs
+      target: /web_server_logs
+      read_only: false
 
     # The services that need to be ready before this one
     depends_on:
-      - database
-      - channel-layer
-      - session-store
-      - message-broker
+    - database
+    - channel-layer
+    - session-store
+    - message-broker
 
-  internet-server: # Gunicorn + Daphne
+  internet-server: # Django = Gunicorn + Daphne
     # Use the Django image we made ourselves by running ./scripts/build/django.sh
     image: omniport-django:latest
 
@@ -142,22 +166,43 @@ services:
 
     command: ["/usr/bin/supervisord", "-c", "/supervisord.conf"]
 
-    # We mount the volumes on the Gunicorn container
+    # Mount the volumes on the Django container
     volumes:
       # Mount the code from the 'omniport' folder in the root of the container 
-      - ./omniport:/omniport
+      - type: bind
+        source: ./omniport
+        target: /omniport
+        read_only: true
 
-      # Mount the images from logos into the static folder in Omniport
-      - ./branding:/omniport/omniport/static/omniport/branding
+      # Mount the YAML files from the 'configuration' folder in the root of the container
+      - type: bind
+        source: ./configuration
+        target: /configuration
+        read_only: true
 
-      # Mount the JSON configuration files into the configuration folder in Omniport
-      - ./configuration:/omniport/configuration
+      # Mount the imagery from the 'branding' folder in the root of the container
+      - type: bind
+        source: ./branding
+        target: /branding
+        read_only: true
+
+      # Mount 'static_files' as its namesake in the root of the container
+      - type: volume
+        source: static_files
+        target: /static_files
+        read_only: false
       
-      # Mount 'media' as its namesake in the root of the container
-      - media:/media
+      # Mount 'media_files' as its namesake in the root of the container
+      - type: volume
+        source: media_files
+        target: /media_files
+        read_only: false
 
       # Mount 'web_server_logs' as its namesake in the root of the container
-      - web_server_logs:/web_server_logs
+      - type: volume
+        source: web_server_logs
+        target: /web_server_logs
+        read_only: false
 
     # The services that need to be ready before this one
     depends_on:
@@ -175,32 +220,56 @@ services:
 
     # Expose the port 80 and 443 used by NGINX to other containers
     expose:
-      - "80"
-      - "443"
+    - "80"
+    - "443"
 
     # Expose the ports 80 and 443 used by NGINX to the host
     ports:
-      - "80:80"
-      - "443:443"
+    - "80:80"
+    - "443:443"
 
     # Mount the volumes on the NGINX container
     volumes:
-      # Mount the code from the 'omniport' folder in the root of the container 
-      - ./omniport:/omniport
+    # Mount the code from the 'omniport' folder in the root of the container 
+    - type: bind
+      source: ./omniport
+      target: /omniport
+      read_only: true
 
-      # Mount 'frontend' as its namesake in the root of the container
-      - frontend:/frontend
+    # Mount the imagery from the 'branding' folder in the root of the container
+    - type: bind
+      source: ./branding
+      target: /branding
+      read_only: true
 
-      # Mount 'media' as its namesake in the root of the container
-      - media:/media
+    # Mount 'frontend' as its namesake in the root of the container
+    - type: volume
+      source: frontend
+      target: /frontend
+      read_only: true
 
-      # Mount 'reverse_proxy_logs' as its namesake in the root of the container
-      - reverse_proxy_logs:/reverse_proxy_logs
+    # Mount 'static_files' as its namesake in the root of the container
+    - type: volume
+      source: static_files
+      target: /static_files
+      read_only: true
+
+    # Mount 'media_files' as its namesake in the root of the container
+    - type: volume
+      source: media_files
+      target: /media_files
+      read_only: true
+
+    # Mount 'reverse_proxy_logs' as its namesake in the root of the container
+    - type: volume
+      source: reverse_proxy_logs
+      target: /reverse_proxy_logs
+      read_only: false
 
     # The services that need to be ready before this one
     depends_on:
-      - intranet-server
-      - internet-server
+    - intranet-server
+    - internet-server
 
 # Volumes are virtual drives connected to containers
 volumes:
@@ -217,7 +286,10 @@ volumes:
   # This volume contains the production build of all frontend apps
   frontend:
 
+  # This volume contains the static files
+  static_files:
+
   # This volume contains the media files
-  media:
+  media_files:
   # This volume contains periodic dumps of the media files for backup
-  media_backup:
+  media_files_backup:
