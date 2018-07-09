@@ -23,12 +23,25 @@ COPY ./requirements.txt ./requirements.txt
 RUN pip install --upgrade pip \
     && pip install --requirement requirements.txt
 
-# Create the logging volume
-RUN mkdir -p /web_server_logs/supervisord_logs/ \
-    && mkdir -p /web_server_logs/gunicorn_logs/ \
-    && mkdir -p /web_server_logs/daphne_logs/ \
-    && chown -R django:django /web_server_logs
-VOLUME /web_server_logs
+# Create the static files volume as a directory
+RUN mkdir -p /static_files \
+    && chown django:django /static_files \
+    && chmod -R o+r /static_files
+
+# Create the media files volume as a directory
+RUN mkdir -p /media_files \
+    && chown -R django:django /media_files \
+    && chmod -R o+r /media_files
+
+# Create the web server logs volume as a directory
+RUN mkdir -p /web_server_logs/supervisord_logs  \
+    && mkdir -p /web_server_logs/gunicorn_logs \
+    && mkdir -p /web_server_logs/daphne_logs \
+    && chown -R django:django /web_server_logs \
+    && chmod -R o+r /web_server_logs
+
+# Change the directories into volumes
+VOLUME /static_files /media_files /web_server_logs
 
 # Copy the supervisord.conf file over to the container
 COPY ./supervisord.conf ./supervisord.conf
