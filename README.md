@@ -31,7 +31,7 @@ Then for additional security, and to emulate the setup I have on my machine, edi
 }
 ```
 
-Note that `<user>` here refers to the user you will be running Docker as. This is most likely your non-root administrator (UID 1000 in most cases). Check out the files `/etc/subuid` and `etc/subgid` for a hint as to who this `<user>` is.
+Note that `<user>` here refers to the user you will be running Docker as. This is most likely your non-root administrator (UID 1000 in most cases). Check out the files `/etc/subuid` and `/etc/subgid` for a hint as to who this `<user>` is.
 
 Then change directory to `/home` and ensure that the home directory of `<user>` has world execute permissions on it. It most likely won't so, grant the permission: `chmod o+x <user>/`. The goal is to ensure that all directories above and leading upto the project have the `x` permission enabled.
 
@@ -52,10 +52,10 @@ The configuration for the project is divided into 3 parts:
 
 - **Message broker, `RabbitMQ`**:
     - Enter the RabbitMQ directory: `cd rabbitmq`
-    - Create `database.env` from `database_stencil.env` and populate the database name, username and password.
+    - Create `message_broker.env` from `message_broker_stencil.env` and populate the message-broker username and password.
 - **Database, `PostgreSQL`**:
     - Enter the PostgreSQL directory: `cd postgres`
-    - Create `message_broker.env` from `message_broker_stencil.env` and populate the message-broker username and password.
+    - Create `database.env` from `database_stencil.env` and populate the database name, username and password.
 - **Web servers, `Gunicorn` and `Daphne`**:
     - Enter the YAML configuration files directory: `cd configuration`
     - Create `base.yml` from `base_stencil.yml`.
