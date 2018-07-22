@@ -1,5 +1,5 @@
 # Use Python from the Debian Linux project
-FROM python:slim-stretch
+FROM python:3.6-slim-stretch
 
 # Add labels for metadata
 LABEL maintainer="Dhruv Bhanushali <https://dhruvkb.github.io/>"
