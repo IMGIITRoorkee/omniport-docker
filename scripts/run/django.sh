@@ -19,9 +19,11 @@ docker run \
 	--network=omniport-docker_default \
 	--publish 8000:8000/tcp \
 	--mount type=bind,src=$PWD/omniport,dst=/omniport \
-	--mount type=bind,src=$PWD/configuration,dst=/omniport/configuration \
-	--mount type=bind,src=$PWD/branding,dst=/omniport/omniport/static/omniport/branding \
-	--mount type=volume,src=omniport-docker_media,dst=/media \
+	--mount type=bind,src=$PWD/configuration,dst=/configuration \
+	--mount type=bind,src=$PWD/branding,dst=/branding \
+	--mount type=volume,src=omniport-docker_media_files,dst=/static_files \
+	--mount type=volume,src=omniport-docker_static_files,dst=/media_files \
+	--mount type=volume,src=omniport-docker_web_server_logs,dst=/web_server_logs \
 	--name=$NAME \
 	--env SITE_ID=0 \
 	omniport-django:latest \
