@@ -94,7 +94,7 @@ For Django to become fully functional, a number of first time as well as periodi
 - Enter the shell on the Django container.
     - **Development:** 
         - Find the ID of the Django container: `docker ps`
-        - Enter the shell on the container: `docker exec <container_name> bash`
+        - Enter the shell on the container: `docker exec -it <container_name> bash`
     - **Production:**
         - Enter the shell on the container: `docker-compose exec intranet-server bash`
 - Enter the Omniport directory: `cd omniport`
