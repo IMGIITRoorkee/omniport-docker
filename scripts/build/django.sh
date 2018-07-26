@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Copy the requirements file from the codebase into the Django Docker folder
-cp omniport/requirements.txt django/
+cp codebase/omniport-backend/omniport/requirements.txt django/
 
 # Enter the Django Docker folder
 cd django/

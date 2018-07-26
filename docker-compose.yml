@@ -104,19 +104,19 @@ services:
     volumes:
     # Mount the code from the 'omniport' folder in the root of the container 
     - type: bind
-      source: ./omniport
+      source: ./codebase/omniport-backend/omniport
       target: /omniport
       read_only: true
 
     # Mount the YAML files from the 'configuration' folder in the root of the container
     - type: bind
-      source: ./configuration
+      source: ./codebase/omniport-backend/configuration
       target: /configuration
       read_only: true
 
     # Mount the imagery from the 'branding' folder in the root of the container
     - type: bind
-      source: ./branding
+      source: ./codebase/omniport-backend/branding
       target: /branding
       read_only: true
 
@@ -170,19 +170,19 @@ services:
     volumes:
       # Mount the code from the 'omniport' folder in the root of the container 
       - type: bind
-        source: ./omniport
+        source: ./codebase/omniport-backend/omniport
         target: /omniport
         read_only: true
 
       # Mount the YAML files from the 'configuration' folder in the root of the container
       - type: bind
-        source: ./configuration
+        source: ./codebase/omniport-backend/configuration
         target: /configuration
         read_only: true
 
       # Mount the imagery from the 'branding' folder in the root of the container
       - type: bind
-        source: ./branding
+        source: ./codebase/omniport-backend/branding
         target: /branding
         read_only: true
 
@@ -230,15 +230,9 @@ services:
 
     # Mount the volumes on the NGINX container
     volumes:
-    # Mount the code from the 'omniport' folder in the root of the container 
-    - type: bind
-      source: ./omniport
-      target: /omniport
-      read_only: true
-
     # Mount the imagery from the 'branding' folder in the root of the container
     - type: bind
-      source: ./branding
+      source: ./codebase/omniport-backend/branding
       target: /branding
       read_only: true
 
