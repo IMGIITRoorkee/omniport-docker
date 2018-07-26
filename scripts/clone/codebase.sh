@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 urlencode() {
     # urlencode <string>
@@ -33,7 +33,7 @@ printf "done\n"
 read -p "Setup the shell for IIT Roorkee? (Y/n)" CLONE_SHELL
 echo
 
-if [ $CLONE_SHELL != 'n' -a $CLONE_SHELL != 'N']; then
+if [ $CLONE_SHELL != 'n' -a $CLONE_SHELL != 'N' ]; then
     printf "Cloning: Omniport Shell (IIT Roorkee)... "
     git clone https://$USERNAME:$PASSWORD@github.com/IMGIITRoorkee/omniport-shell.git shell &> /dev/null
     printf "done\n"
