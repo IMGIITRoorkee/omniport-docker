@@ -1,0 +1,2 @@
+# Ignore the message broker environment variables
+message_broker.env

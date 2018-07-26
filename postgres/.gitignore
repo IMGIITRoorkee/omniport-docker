@@ -1,0 +1,2 @@
+# Ignore the database environment variables
+database.env

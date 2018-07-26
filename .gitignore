@@ -4,23 +4,5 @@
 # VSCode configuration
 .vscode/
 
-# Cloned codebase
-omniport/
-omniport
-
-# Database environment file
-postgres/database.env
-
-# Message broker environment file
-rabbitmq/message_broker.env
-
-# Ignore the base JSON configuration file
-configuration/base.yml
-
-# Ignore the site-specific JSON configuration files
-configuration/sites/site_[0-9].yml
-
-# Ignore trhe logos of the portal, institute and maintainers
-branding/*
-# ... but commit the README.md file
-!branding/README.md
+# Codebase (backend and frontend)
+codebase/
