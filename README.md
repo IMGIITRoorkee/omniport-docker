@@ -21,7 +21,7 @@ The following instructions should get your system up and running in no time at a
 
 ### Installation
 
-You need to have Docker and Docker Compose installed on your system. Pro-tip: create the alias `dc=docker-compose` in your `.bashrc` file. 
+You need to have Docker and Docker Compose installed on your system. Pro-tip: create the alias for `docker-compose` in your `.bashrc` (or in some operating systems, `.bash_aliases`): `alias dc='docker-compose'`
 
 Then for additional security, and to emulate the setup I have on my machine, edit the file `/etc/docker/daemon.json` as follows. Create the file if it does not exist already. Learn about user namespace remapping to better understand what this change does.
 
