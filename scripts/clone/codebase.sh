@@ -32,7 +32,6 @@ cd omniport-backend/omniport/
 printf "done\n"
 
 read -p "Setup the shell for IIT Roorkee? (Y/n)" CLONE_SHELL
-echo
 
 if [ $CLONE_SHELL != 'n' -a $CLONE_SHELL != 'N' ]; then
     printf "Cloning: Omniport Shell (IIT Roorkee)... "
