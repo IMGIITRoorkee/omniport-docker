@@ -4,4 +4,5 @@
 cd nginx/
 
 # Build the container from the nginx folder and tag it
-docker build --tag omniport-nginx .
+TIMESTAMP=$(date +"%s")
+docker build --tag omniport-nginx:${TIMESTAMP} --tag omniport-nginx:latest .
