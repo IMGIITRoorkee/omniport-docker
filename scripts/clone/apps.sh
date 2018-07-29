@@ -20,13 +20,13 @@ urlencode() {
 
 read -p "GitHub username: " USERNAME
 read -s -p "GitHub password: " PASSWORD
-PASSWORD=$(urlencode $PASSWORD)
+PASSWORD=$(urlencode ${PASSWORD})
 echo
 
 cd codebase/omniport-backend/omniport/apps
 
 printf "Cloning: Omniport Functionality... "
 cd apps/
-git clone https://$USERNAME:$PASSWORD@github.com/IMGIITRoorkee/omniport-functionality.git functionality &> /dev/null
+git clone https://${USERNAME}:${PASSWORD}@github.com/IMGIITRoorkee/omniport-functionality.git functionality &> /dev/null
 cd ..
 printf "done\n"
