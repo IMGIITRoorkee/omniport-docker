@@ -56,6 +56,42 @@ services:
     # Run the container as the non-root user
     user: redis
 
+  notification-store: # Redis
+    # Use the Redis image from Alpine Linux as is
+    image: redis:alpine
+
+    # No matter what, if the container stops, start it again
+    restart: always
+
+    # Expose the port 6379 used by Redis to other containers
+    expose:
+    - "6379"
+
+    # Run the container as the non-root user
+    user: redis
+
+  redis-gui:
+    # Use the Redis Commander image as is
+    image: rediscommander/redis-commander:latest
+
+    # No matter what, if the container stops, start it again
+    restart: always 
+    
+    # Expose the port 8081 used by Redis commander to the host
+    ports:
+    - "8081:8081"
+
+    environment:
+    - 'REDIS_HOSTS=
+      channel-layer:channel-layer,
+      session-store:session-store,
+      notification-store:notification-store'
+
+    depends_on:
+    - channel-layer
+    - session-store
+    - notification-store
+
   message-broker: # RabbitMQ
     # Use the RabbitMQ image from Alpine Linux as is
     image: rabbitmq:management-alpine
