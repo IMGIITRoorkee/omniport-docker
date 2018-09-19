@@ -70,7 +70,7 @@ services:
     # Run the container as the non-root user
     user: redis
 
-  redis-gui:
+  redis-gui: # Redis Commander
     # Use the Redis Commander image as is
     image: rediscommander/redis-commander:latest
 
@@ -91,6 +91,20 @@ services:
     - channel-layer
     - session-store
     - notification-store
+
+  cache: # Memcached
+    # Use the Memcached image from Alpine Linux as is
+    image: memcached:alpine
+
+    # No matter what, if the container stops, start it again
+    restart: always
+
+    # Expose the port 5672 used by RabbitMQ to other containers
+    expose:
+    - "11211"
+
+    # Run the container as the non-root user
+    user: memcache
 
   message-broker: # RabbitMQ
     # Use the RabbitMQ image from Alpine Linux as is
