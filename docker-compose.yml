@@ -28,6 +28,10 @@ services:
       target: /var/lib/postgresql/data
       read_only: false
 
+    # Connect to the custom default network
+    networks:
+    - network
+
   channel-layer: # Redis
     # Use the Redis image from Alpine Linux as is
     image: redis:alpine
@@ -41,6 +45,18 @@ services:
 
     # Run the container as the non-root user
     user: redis
+
+    # Mount the volumes on the channel layer container
+    volumes:
+      # Mount 'channel_layer' as the place where Redis stores its dumps
+    - type: volume
+      source: channel_layer
+      target: /data
+      read_only: false
+
+    # Connect to the custom default network
+    networks:
+    - network
 
   session-store: # Redis
     # Use the Redis image from Alpine Linux as is
@@ -56,6 +72,18 @@ services:
     # Run the container as the non-root user
     user: redis
 
+    # Mount the volumes on the session store container
+    volumes:
+      # Mount 'session_store' as the place where Redis stores all its dumps
+    - type: volume
+      source: session_store
+      target: /data
+      read_only: false
+
+    # Connect to the custom default network
+    networks:
+    - network
+
   notification-store: # Redis
     # Use the Redis image from Alpine Linux as is
     image: redis:alpine
@@ -70,6 +98,18 @@ services:
     # Run the container as the non-root user
     user: redis
 
+    # Mount the volumes on the notification store container
+    volumes:
+      # Mount 'notification_store' as the place where Redis stores its dumps
+    - type: volume
+      source: notification_store
+      target: /data
+      read_only: false
+
+    # Connect to the custom default network
+    networks:
+    - network
+
   redis-gui: # Redis Commander
     # Use the Redis Commander image as is
     image: rediscommander/redis-commander:latest
@@ -81,16 +121,22 @@ services:
     ports:
     - "8081:8081"
 
+    # Set the REDIS_HOSTS environment variable so that the Redis servers can be connected
     environment:
     - 'REDIS_HOSTS=
       channel-layer:channel-layer,
       session-store:session-store,
       notification-store:notification-store'
 
+    # The services that need to be ready before this one
     depends_on:
     - channel-layer
     - session-store
     - notification-store
+
+    # Connect to the custom default network
+    networks:
+    - network
 
   cache: # Memcached
     # Use the Memcached image from Alpine Linux as is
@@ -105,6 +151,10 @@ services:
 
     # Run the container as the non-root user
     user: memcache
+
+    # Connect to the custom default network
+    networks:
+    - network
 
   message-broker: # RabbitMQ
     # Use the RabbitMQ image from Alpine Linux as is
@@ -128,6 +178,18 @@ services:
     env_file:
     - rabbitmq/message_broker.env
 
+    # Mount the volumes on the message broker container
+    volumes:
+      # Mount 'rabbitmq-data' as the place where RabbitMQ stores its data
+    - type: volume
+      source: rabbitmq_data
+      target: /var/lib/rabbitmq
+      read_only: false
+
+    # Connect to the custom default network
+    networks:
+    - network
+
   intranet-server: # Django = Gunicorn + Daphne
     # Use the Django image we made ourselves by running ./scripts/build/django.sh
     image: omniport-django:latest
@@ -143,11 +205,10 @@ services:
     # Run the container as the non-root user
     user: django
 
-    # Set the SITE_ID environment variable so that the right JSON may be processed
+    # Set the SITE_ID environment variable so that the right YAML is processed
     environment:
     - SITE_ID=1
 
-    # Change the port to ensure that each site runs on its own port
     command: ["/usr/bin/supervisord", "-c", "/supervisord.conf"]
 
     # Mount the volumes on the Django container
@@ -195,6 +256,10 @@ services:
     - session-store
     - message-broker
 
+    # Connect to the custom default network
+    networks:
+    - network
+
   internet-server: # Django = Gunicorn + Daphne
     # Use the Django image we made ourselves by running ./scripts/build/django.sh
     image: omniport-django:latest
@@ -210,7 +275,7 @@ services:
     # Run the container as the non-root user
     user: django
 
-    # Set the SITE_ID environment variable so that the right JSON may be processed
+    # Set the SITE_ID environment variable so that the right YAML is processed
     environment:
       - SITE_ID=2
 
@@ -261,6 +326,10 @@ services:
       - session-store
       - message-broker
 
+    # Connect to the custom default network
+    networks:
+    - network
+
   reverse-proxy: # NGINX
     # Use the NGINX image we made ourselves by running ./scripts/build/nginx.sh
     image: omniport-nginx:latest
@@ -277,6 +346,10 @@ services:
     ports:
     - "80:80"
     - "443:443"
+
+    # Connect to the custom default network
+    networks:
+    - network
 
     # Mount the volumes on the NGINX container
     volumes:
@@ -315,6 +388,10 @@ services:
     - intranet-server
     - internet-server
 
+    # Connect to the custom default network
+    networks:
+    - network
+
 # Volumes are virtual drives connected to containers
 volumes:
   # This volume contains the database and PostgreSQL configuration files
@@ -337,3 +414,18 @@ volumes:
   media_files:
   # This volume contains periodic dumps of the media files for backup
   media_files_backup:
+
+  # RabbitMQ needs a volume at /var/lib/rabbitmq/
+  rabbitmq_data:
+
+  # Periodic dumps taken by Redis acting as channel layer
+  channel_layer:
+  # Periodic dumps taken by Redis acting as session store
+  session_store:
+  # Periodic dumps taken by Redis acting as notification store
+  notification_store:
+
+# Networks specify how containers communicate with each other and the host
+networks:
+  # Create a network to override Docker's ambiguously named default
+  network:
