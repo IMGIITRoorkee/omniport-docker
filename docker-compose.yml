@@ -208,42 +208,43 @@ services:
     # Set the SITE_ID environment variable so that the right YAML is processed
     environment:
     - SITE_ID=1
+    - NAME=intranet-server
 
     command: ["/usr/bin/supervisord", "-c", "/supervisord.conf"]
 
     # Mount the volumes on the Django container
     volumes:
-    # Mount the code from the 'omniport' folder in the root of the container 
+      # Mount the code from the 'omniport' folder in the root of the container 
     - type: bind
       source: ./codebase/omniport-backend/omniport
       target: /omniport
       read_only: true
 
-    # Mount the YAML files from the 'configuration' folder in the root of the container
+      # Mount the YAML files from the 'configuration' folder in the root of the container
     - type: bind
       source: ./codebase/omniport-backend/configuration
       target: /configuration
       read_only: true
 
-    # Mount the imagery from the 'branding' folder in the root of the container
+      # Mount the imagery from the 'branding' folder in the root of the container
     - type: bind
       source: ./codebase/omniport-backend/branding
       target: /branding
       read_only: true
 
-    # Mount 'static_files' as its namesake in the root of the container
+      # Mount 'static_files' as its namesake in the root of the container
     - type: volume
       source: static_files
       target: /static_files
       read_only: false
       
-    # Mount 'media_files' as its namesake in the root of the container
+      # Mount 'media_files' as its namesake in the root of the container
     - type: volume
       source: media_files
       target: /media_files
       read_only: false
 
-    # Mount 'web_server_logs' as its namesake in the root of the container
+      # Mount 'web_server_logs' as its namesake in the root of the container
     - type: volume
       source: web_server_logs
       target: /web_server_logs
@@ -269,62 +270,63 @@ services:
 
     # Expose the ports 8000 and 8001 used by Gunicorn and Daphne to other containers
     expose:
-      - "8000"
-      - "8001"
+    - "8000"
+    - "8001"
 
     # Run the container as the non-root user
     user: django
 
     # Set the SITE_ID environment variable so that the right YAML is processed
     environment:
-      - SITE_ID=2
+    - SITE_ID=2
+    - NAME=internet-server
 
     command: ["/usr/bin/supervisord", "-c", "/supervisord.conf"]
 
     # Mount the volumes on the Django container
     volumes:
       # Mount the code from the 'omniport' folder in the root of the container 
-      - type: bind
-        source: ./codebase/omniport-backend/omniport
-        target: /omniport
-        read_only: true
+    - type: bind
+      source: ./codebase/omniport-backend/omniport
+      target: /omniport
+      read_only: true
 
       # Mount the YAML files from the 'configuration' folder in the root of the container
-      - type: bind
-        source: ./codebase/omniport-backend/configuration
-        target: /configuration
-        read_only: true
+    - type: bind
+      source: ./codebase/omniport-backend/configuration
+      target: /configuration
+      read_only: true
 
       # Mount the imagery from the 'branding' folder in the root of the container
-      - type: bind
-        source: ./codebase/omniport-backend/branding
-        target: /branding
-        read_only: true
+    - type: bind
+      source: ./codebase/omniport-backend/branding
+      target: /branding
+      read_only: true
 
       # Mount 'static_files' as its namesake in the root of the container
-      - type: volume
-        source: static_files
-        target: /static_files
-        read_only: false
+    - type: volume
+      source: static_files
+      target: /static_files
+      read_only: false
       
       # Mount 'media_files' as its namesake in the root of the container
-      - type: volume
-        source: media_files
-        target: /media_files
-        read_only: false
+    - type: volume
+      source: media_files
+      target: /media_files
+      read_only: false
 
       # Mount 'web_server_logs' as its namesake in the root of the container
-      - type: volume
-        source: web_server_logs
-        target: /web_server_logs
-        read_only: false
+    - type: volume
+      source: web_server_logs
+      target: /web_server_logs
+      read_only: false
 
     # The services that need to be ready before this one
     depends_on:
-      - database
-      - channel-layer
-      - session-store
-      - message-broker
+    - database
+    - channel-layer
+    - session-store
+    - message-broker
 
     # Connect to the custom default network
     networks:
@@ -353,31 +355,31 @@ services:
 
     # Mount the volumes on the NGINX container
     volumes:
-    # Mount the imagery from the 'branding' folder in the root of the container
+      # Mount the imagery from the 'branding' folder in the root of the container
     - type: bind
       source: ./codebase/omniport-backend/branding
       target: /branding
       read_only: true
 
-    # Mount 'frontend' as its namesake in the root of the container
+      # Mount 'frontend' as its namesake in the root of the container
     - type: volume
       source: frontend
       target: /frontend
       read_only: true
 
-    # Mount 'static_files' as its namesake in the root of the container
+      # Mount 'static_files' as its namesake in the root of the container
     - type: volume
       source: static_files
       target: /static_files
       read_only: true
 
-    # Mount 'media_files' as its namesake in the root of the container
+      # Mount 'media_files' as its namesake in the root of the container
     - type: volume
       source: media_files
       target: /media_files
       read_only: true
 
-    # Mount 'reverse_proxy_logs' as its namesake in the root of the container
+      # Mount 'reverse_proxy_logs' as its namesake in the root of the container
     - type: volume
       source: reverse_proxy_logs
       target: /reverse_proxy_logs
