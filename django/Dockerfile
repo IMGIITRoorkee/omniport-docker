@@ -49,5 +49,11 @@ COPY ./supervisord.conf ./supervisord.conf
 # Copy the gunicorn_config.py file over to the container
 COPY ./gunicorn_config.py ./gunicorn_config.py
 
+# Jazz up the bash prompt in the container
+RUN echo 'PS1="[🐳@\$NAME \W]\\$ "' >> /etc/bash.bashrc
+
 # Define environment variables
 ENV PYTHONPATH="/omniport:/omniport/core:/omniport/services:/omniport/apps"
+
+# Enter the omniport directory
+WORKDIR /omniport
