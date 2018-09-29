@@ -33,6 +33,11 @@ RUN mkdir -p /media_files \
     && chown -R django:django /media_files \
     && chmod -R o+r /media_files
 
+# Create the personal files volume as a directory
+RUN mkdir -p /personal_files \
+    && chown -R django:django /personal_files \
+    && chmod -R o+r /personal_files
+
 # Create the web server logs volume as a directory
 RUN mkdir -p /web_server_logs/supervisord_logs  \
     && mkdir -p /web_server_logs/gunicorn_logs \
@@ -41,7 +46,7 @@ RUN mkdir -p /web_server_logs/supervisord_logs  \
     && chmod -R o+r /web_server_logs
 
 # Change the directories into volumes
-VOLUME /static_files /media_files /web_server_logs
+VOLUME /static_files /media_files /personal_files /web_server_logs
 
 # Copy the supervisord.conf file over to the container
 COPY ./supervisord.conf ./supervisord.conf
