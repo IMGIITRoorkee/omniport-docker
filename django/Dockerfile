@@ -54,6 +54,10 @@ COPY ./supervisord.conf ./supervisord.conf
 # Copy the gunicorn_config.py file over to the container
 COPY ./gunicorn_config.py ./gunicorn_config.py
 
+# Grant read rights to supervisord.conf and gunicorn_config.py
+RUN chown django:django ./supervisord.conf \
+    && chown django:django ./gunicorn_config.py
+
 # Jazz up the bash prompt in the container
 RUN echo 'PS1="[🐳@\$NAME \W]\\$ "' >> /etc/bash.bashrc
 
