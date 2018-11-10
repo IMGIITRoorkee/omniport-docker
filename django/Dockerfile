@@ -15,13 +15,17 @@ RUN apt-get update \
 # Work in the root directory of the container
 WORKDIR /
 
-# Copy the requirements.txt file over to the container
-# This command implies an image rebuild when requirements.txt changes
-COPY ./requirements.txt ./requirements.txt
+# Copy the prod-requirements.txt and dev-requirements.txt files over to the container
+# This command implies an image rebuild when PyPI requirements change
+# Do understand that dev-requirements.txt may be blank depending on input to build script
+COPY ./prod-requirements.txt ./prod-requirements.txt
+COPY ./dev-requirements.txt ./dev-requirements.txt
 
 # Install pip packages
 RUN pip install --upgrade pip \
-    && pip install --requirement requirements.txt
+    && pip install --upgrade setuptools \
+    && pip install --requirement prod-requirements.txt \
+    && pip install --requirement dev-requirements.txt
 
 # Create the static files volume as a directory
 RUN mkdir -p /static_files \
