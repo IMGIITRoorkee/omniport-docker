@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Copy the prod-requirements.txt file from the codebase into the Django Docker folder
 cp codebase/omniport-backend/omniport/prod-requirements.txt django/
