@@ -62,9 +62,6 @@ COPY ./gunicorn_config.py ./gunicorn_config.py
 RUN chown django:django ./supervisord.conf \
     && chown django:django ./gunicorn_config.py
 
-# Jazz up the bash prompt in the container
-RUN echo 'PS1="[🐳@\$NAME \W]\\$ "' >> /etc/bash.bashrc
-
 # Define environment variables
 ENV PYTHONPATH="/omniport:/omniport/core:/omniport/services:/omniport/apps"
 
