@@ -39,8 +39,9 @@ if [ $CLONE_SHELL != 'n' -a $CLONE_SHELL != 'N' ]; then
     printf "done\n"
 fi
 
-printf "Cloning: Omniport Bootstrap... "
+# Clone the services in the services/ directory
 cd services/
+
+printf "Cloning: Omniport Bootstrap... "
 git clone https://${USERNAME}:${PASSWORD}@github.com/IMGIITRoorkee/omniport-bootstrap.git bootstrap &> /dev/null
-cd ..
 printf "done\n"
