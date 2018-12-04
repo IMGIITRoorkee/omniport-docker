@@ -65,5 +65,8 @@ RUN chown django:django ./supervisord.conf \
 # Define environment variables
 ENV PYTHONPATH="/omniport:/omniport/core:/omniport/services:/omniport/apps"
 
+# Add some terminal jazz
+RUN echo "PS1='docker@\$NAME:\w\$ '" >> /etc/bash.bashrc
+
 # Enter the omniport directory
 WORKDIR /omniport
