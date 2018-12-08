@@ -4,6 +4,9 @@ FROM python:slim-stretch
 # Add labels for metadata
 LABEL maintainer="Dhruv Bhanushali <https://dhruvkb.github.io/>"
 
+# Determines whether to build a production or a development package
+ARG IMAGETYPE
+
 # Create a non-root user
 RUN groupadd --system django && useradd --system --gid django django
 
@@ -12,20 +15,22 @@ RUN apt-get update \
     && apt-get install -y gcc supervisor \
     && rm -rf /var/lib/apt/lists/*
 
-# Work in the root directory of the container
-WORKDIR /
-
-# Copy the prod-requirements.txt and dev-requirements.txt files over to the container
-# This command implies an image rebuild when PyPI requirements change
-# Do understand that dev-requirements.txt may be blank depending on input to build script
-COPY ./prod-requirements.txt ./prod-requirements.txt
-COPY ./dev-requirements.txt ./dev-requirements.txt
-
 # Install pip packages
 RUN pip install --upgrade pip \
     && pip install --upgrade setuptools \
-    && pip install --requirement prod-requirements.txt \
-    && pip install --requirement dev-requirements.txt
+    && pip install --upgrade pipenv
+
+# Work in the root directory of the container
+WORKDIR /
+
+# Copy the file Pipfile.lock over to the container
+# This command implies an image rebuild when PyPI requirements change
+COPY ./Pipfile ./Pipfile
+COPY ./Pipfile.lock ./Pipfile.lock
+
+# Install dependencies from the file Pipfile.lock
+# Depending on build args, dev packages may not be installed
+RUN pipenv install --deploy --system ${IMAGETYPE}
 
 # Create the static files volume as a directory
 RUN mkdir -p /static_files \

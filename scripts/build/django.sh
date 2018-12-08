@@ -1,15 +1,22 @@
 #!/bin/bash
 
 # Copy the prod-requirements.txt file from the codebase into the Django Docker folder
-cp codebase/omniport-backend/omniport/prod-requirements.txt django/
+cp codebase/omniport-backend/Pipfile      django/
+cp codebase/omniport-backend/Pipfile.lock django/
 
 read -p "Add PyPI dependencies for developer tools? (y/N): " DEV_TOOLS
 if [ $DEV_TOOLS == 'Y' -o $DEV_TOOLS == 'y' ]; then
-    # Copy the dev-requirements.txt file from the codebase into the Django Docker folder
-    cp codebase/omniport-backend/omniport/dev-requirements.txt django/
+    # Set the build argument IMAGETYPE to --dev
+    IMAGETYPE='--dev'
+
+    # Assign a tag of dev-latest for usecases that mandate development
+    TAG='dev-latest'
 else
-    # Ensure a blank dev-requirements.txt file exists
-    echo '' > django/dev-requirements.txt
+    # Set the build argument IMAGETYPE to blank
+    IMAGETYPE=''
+
+    # Assign a tag of prod-latest for usecases that mandate production
+    TAG='prod-latest'
 fi
 
 # Enter the Django Docker folder
@@ -17,7 +24,14 @@ cd django/
 
 # Build the container from the Django folder and tag it
 TIMESTAMP=$(date +"%s")
-docker build --tag omniport-django:${TIMESTAMP} --tag omniport-django:latest .
+
+docker build \
+    --build-arg IMAGETYPE=${IMAGETYPE} \
+    --tag omniport-django:${TIMESTAMP} \
+    --tag omniport-django:${TAG} \
+    --tag omniport-django:latest \
+    .
 
 # Remove the requirement files after they have served their purpose
-rm prod-requirements.txt dev-requirements.txt
+rm Pipfile
+rm Pipfile.lock
