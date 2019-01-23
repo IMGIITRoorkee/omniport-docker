@@ -1,0 +1,2 @@
+# Ignore the .conf files generated using the stencils
+conf.d/*.conf
