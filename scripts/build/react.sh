@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Copy the yarn.lock file from the codebase into the React Docker folder
 cp codebase/omniport-frontend/omniport/package.json react/
