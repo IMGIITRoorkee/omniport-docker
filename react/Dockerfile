@@ -21,14 +21,6 @@ COPY ./yarn.lock ./yarn.lock
 # Install dependenices from the file yarn.lock
 RUN yarn install ${IMAGETYPE}
 
-# Create the frontend volume as a folder
-RUN mkdir -p /frontend \
-    && chown -R react:react /frontend \
-    && chmod -R o+r /frontend
-
-# Change the directories into volumes
-VOLUME /frontend
-
 # Add some terminal jazz
 RUN echo "PS1='docker@\$NAME:\w\$ '" >> /etc/bash.bashrc
 
