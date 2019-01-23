@@ -373,9 +373,9 @@ services:
       target: /branding
       read_only: true
 
-      # Mount 'frontend' as its namesake in the root of the container
-    - type: volume
-      source: frontend
+      # Mount 'build' as 'frontend' in the root of the container
+    - type: bind
+      source: ./codebase/omniport-frontend/omniport/build
       target: /frontend
       read_only: true
 
@@ -423,9 +423,6 @@ volumes:
   reverse_proxy_logs:
   # This volume contains web server logs
   web_server_logs:
-
-  # This volume contains the production build of all frontend apps
-  frontend:
 
   # This volume contains the static files
   static_files:
