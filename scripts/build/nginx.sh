@@ -15,9 +15,9 @@ if [ $REBUILD == 'Y' -o $REBUILD == 'y' ]; then
     rm 01-intranet.conf 02-internet.conf
 
     # Perform text substitution to generate the new .conf files
-    cp templates/01-intranet.conf ./01-intranet.conf
+    cp stencils/01-intranet.conf ./01-intranet.conf
     sed -i "s/\[\[intranet_domain\]\]/${INTRANET_DOMAIN}/g" 01-intranet.conf
-    cp templates/02-internet.conf ./02-internet.conf
+    cp stencils/02-internet.conf ./02-internet.conf
     sed -i "s/\[\[internet_domain\]\]/${INTERNET_DOMAIN}/g" 02-internet.conf
 
     # Get back out
