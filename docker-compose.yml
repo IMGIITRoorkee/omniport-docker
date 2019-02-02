@@ -84,7 +84,7 @@ services:
     networks:
     - network
 
-  notification-store: # Redis
+  communication-store: # Redis
     # Use the Redis image from Alpine Linux as is
     image: redis:alpine
 
@@ -98,11 +98,11 @@ services:
     # Run the container as the non-root user
     user: redis
 
-    # Mount the volumes on the notification store container
+    # Mount the volumes on the communication store container
     volumes:
-      # Mount 'notification_store' as the place where Redis stores its dumps
+      # Mount 'communication_store' as the place where Redis stores its dumps
     - type: volume
-      source: notification_store
+      source: communication_store
       target: /data
       read_only: false
 
@@ -126,13 +126,13 @@ services:
     - 'REDIS_HOSTS=
       channel-layer:channel-layer,
       session-store:session-store,
-      notification-store:notification-store'
+      communication-store:communication-store'
 
     # The services that need to be ready before this one
     depends_on:
     - channel-layer
     - session-store
-    - notification-store
+    - communication-store
 
     # Connect to the custom default network
     networks:
@@ -261,6 +261,7 @@ services:
     - database
     - channel-layer
     - session-store
+    - communication-store
     - message-broker
 
     # Connect to the custom default network
@@ -338,6 +339,7 @@ services:
     - database
     - channel-layer
     - session-store
+    - communication-store
     - message-broker
 
     # Connect to the custom default network
@@ -444,8 +446,8 @@ volumes:
   channel_layer:
   # Periodic dumps taken by Redis acting as session store
   session_store:
-  # Periodic dumps taken by Redis acting as notification store
-  notification_store:
+  # Periodic dumps taken by Redis acting as communication store
+  communication_store:
 
 # Networks specify how containers communicate with each other and the host
 networks:
