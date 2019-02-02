@@ -381,6 +381,12 @@ services:
       target: /frontend
       read_only: true
 
+      # Mount 'cert' as 'cert' in the root of the container
+    - type: bind
+      source: ./cert
+      target: /cert
+      read_only: true
+
       # Mount 'static_files' as its namesake in the root of the container
     - type: volume
       source: static_files
