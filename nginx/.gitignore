@@ -1,2 +1,3 @@
 # Ignore the .conf files generated using the stencils
 conf.d/*.conf
+conf.d/includes/*-http_redirect.conf

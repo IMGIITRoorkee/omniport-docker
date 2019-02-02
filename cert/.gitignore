@@ -1,0 +1,5 @@
+# Ignore the private key
+omniport.key
+
+# Ignore the certificate
+omniport.crt
