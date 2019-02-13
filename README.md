@@ -11,14 +11,8 @@ will probably lead to a lot of anguish.
 
 ## Technological stack
 
-- Framework: `Django`
-- Language: `Python`
-- Reverse proxy: `NGINX`
-- WSGI server: `Gunicorn`
-- ASGI server: `Daphne`
-- Database: `PostgreSQL`
-- Cache: `Memcached`
-- In-memory store: `Redis`
+- Containerisation: `Docker`
+- Orchestration: `Docker Compose`
 
 This Dockerised setup is the preferred mode of installation. You can however set 
 all the components up yourself, after suffering a reasonable amount of 
