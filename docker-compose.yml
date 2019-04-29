@@ -210,7 +210,7 @@ services:
     - SITE_ID=1
     - NAME=intranet-server
 
-    command: ["/usr/bin/supervisord", "-c", "/supervisord.conf"]
+    command: ["supervisord", "-c", "/supervisord.conf"]
 
     # Mount the volumes on the Django container
     volumes:
@@ -288,7 +288,7 @@ services:
     - SITE_ID=2
     - NAME=internet-server
 
-    command: ["/usr/bin/supervisord", "-c", "/supervisord.conf"]
+    command: ["supervisord", "-c", "/supervisord.conf"]
 
     # Mount the volumes on the Django container
     volumes:

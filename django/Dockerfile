@@ -12,13 +12,14 @@ RUN groupadd --system django && useradd --system --gid django django
 
 # Install dependencies
 RUN apt-get update \
-    && apt-get install -y gcc supervisor \
+    && apt-get install -y gcc \
     && rm -rf /var/lib/apt/lists/*
 
 # Install pip packages
 RUN pip install --upgrade pip \
     && pip install --upgrade setuptools \
-    && pip install --upgrade pipenv
+    && pip install --upgrade pipenv \
+    && pip install --upgrade supervisor
 
 # Work in the root directory of the container
 WORKDIR /
