@@ -52,6 +52,7 @@ RUN mkdir -p /personal_files \
 RUN mkdir -p /web_server_logs/supervisord_logs  \
     && mkdir -p /web_server_logs/gunicorn_logs \
     && mkdir -p /web_server_logs/daphne_logs \
+    && mkdir -p /web_server_logs/server_logs \
     && chown -R django:django /web_server_logs \
     && chmod -R o+r /web_server_logs
 
