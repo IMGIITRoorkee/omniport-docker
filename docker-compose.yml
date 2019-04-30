@@ -1,13 +1,23 @@
 # The version of the docker-compose standard being followed here
-version: '3.2'
+version: '3.4'
 
 # Services are groups of containers handling one aspect of the application
 services:
   database: # PostgreSQL
-    image: postgres:alpine
+    # Use the PostgreSQL image we made ourselves by running ./scripts/build/postgres.sh
+    image: omniport-postgres:latest
 
     # No matter what, if the container stops, start it again
     restart: always
+
+    # Check the health of the container periodically
+    healthcheck:
+      test: ['CMD', 'checkhealth']
+      retries: 4
+
+      interval: 16m
+      timeout: 16s
+      start_period: 2m
 
     # Expose the port 5432 used by PostgreSQL to other containers
     expose:
@@ -33,8 +43,17 @@ services:
     - network
 
   channel-layer: # Redis
-    # Use the Redis image from Alpine Linux as is
-    image: redis:alpine
+    # Use the Redis image we made ourselves by running ./scripts/build/redis.sh
+    image: omniport-redis:latest
+
+    # Check the health of the container periodically
+    healthcheck:
+      test: ['CMD', 'checkhealth']
+      retries: 4
+
+      interval: 16m
+      timeout: 16s
+      start_period: 2m
 
     # No matter what, if the container stops, start it again
     restart: always
@@ -59,8 +78,17 @@ services:
     - network
 
   session-store: # Redis
-    # Use the Redis image from Alpine Linux as is
-    image: redis:alpine
+    # Use the Redis image we made ourselves by running ./scripts/build/redis.sh
+    image: omniport-redis:latest
+
+    # Check the health of the container periodically
+    healthcheck:
+      test: ['CMD', 'checkhealth']
+      retries: 4
+
+      interval: 16m
+      timeout: 16s
+      start_period: 2m
 
     # No matter what, if the container stops, start it again
     restart: always
@@ -85,8 +113,17 @@ services:
     - network
 
   communication-store: # Redis
-    # Use the Redis image from Alpine Linux as is
-    image: redis:alpine
+    # Use the Redis image we made ourselves by running ./scripts/build/redis.sh
+    image: omniport-redis:latest
+
+    # Check the health of the container periodically
+    healthcheck:
+      test: ['CMD', 'checkhealth']
+      retries: 4
+
+      interval: 16m
+      timeout: 16s
+      start_period: 2m
 
     # No matter what, if the container stops, start it again
     restart: always
@@ -114,6 +151,15 @@ services:
     # Use the Redis Commander image as is
     image: rediscommander/redis-commander:latest
 
+    # Check the health of the container periodically
+    healthcheck:
+      test: ['CMD', 'nc', '-z', '127.0.0.1', '8081']
+      retries: 4
+
+      interval: 16m
+      timeout: 16s
+      start_period: 2m
+
     # No matter what, if the container stops, start it again
     restart: always 
     
@@ -139,8 +185,17 @@ services:
     - network
 
   cache: # Memcached
-    # Use the Memcached image from Alpine Linux as is
-    image: memcached:alpine
+    # Use the Memcached image we made ourselves by running ./scripts/build/memcached.sh
+    image: omniport-memcached:latest
+
+    # Check the health of the container periodically
+    healthcheck:
+      test: ['CMD', 'netcat', '-z', '127.0.0.1', '11211']
+      retries: 4
+
+      interval: 16m
+      timeout: 16s
+      start_period: 2m
 
     # No matter what, if the container stops, start it again
     restart: always
@@ -157,8 +212,17 @@ services:
     - network
 
   message-broker: # RabbitMQ
-    # Use the RabbitMQ image from Alpine Linux as is
-    image: rabbitmq:management-alpine
+    # Use the RabbitMQ image we made ourselves by running ./scripts/build/rabbitmq.sh
+    image: omniport-rabbitmq:latest
+
+    # Check the health of the container periodically
+    healthcheck:
+      test: ['CMD', 'checkhealth']
+      retries: 4
+
+      interval: 16m
+      timeout: 16s
+      start_period: 2m
 
     # No matter what, if the container stops, start it again
     restart: always
