@@ -296,6 +296,12 @@ services:
       target: /branding
       read_only: true
 
+      # Mount the third-party service certificates from the 'certificates' folder in the root of the container
+    - type: bind
+      source: ./codebase/omniport-backend/certificates
+      target: /certificates
+      read_only: true
+
       # Mount 'static_files' as its namesake in the root of the container
     - type: volume
       source: static_files
@@ -372,6 +378,12 @@ services:
     - type: bind
       source: ./codebase/omniport-backend/branding
       target: /branding
+      read_only: true
+
+      # Mount the third-party service certificates from the 'certificates' folder in the root of the container
+    - type: bind
+      source: ./codebase/omniport-backend/certificates
+      target: /certificates
       read_only: true
 
       # Mount 'static_files' as its namesake in the root of the container
