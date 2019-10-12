@@ -320,6 +320,12 @@ services:
       target: /personal_files
       read_only: false
 
+      # Mount 'supervisor.d' as its namesake in the root of the container
+    - type: volume
+      source: supervisor.d
+      target: /supervisor.d
+      read_only: false
+
       # Mount 'web_server_logs' as its namesake in the root of the container
     - type: volume
       source: web_server_logs
@@ -402,6 +408,12 @@ services:
     - type: volume
       source: personal_files
       target: /personal_files
+      read_only: false
+
+      # Mount 'supervisor.d' as its namesake in the root of the container
+    - type: volume
+      source: supervisor.d
+      target: /supervisor.d
       read_only: false
 
       # Mount 'web_server_logs' as its namesake in the root of the container
@@ -520,6 +532,9 @@ volumes:
   personal_files:
   # This volume contains periodic dumps of the personal files for backup
   personal_files_backup:
+
+  # This volume contains the supervisor.d conf files
+  supervisor.d:
 
   # RabbitMQ needs a volume at /var/lib/rabbitmq/
   rabbitmq_data:
