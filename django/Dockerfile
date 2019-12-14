@@ -61,8 +61,13 @@ RUN mkdir -p /web_server_logs/supervisord_logs  \
     && chown -R django:django /web_server_logs \
     && chmod -R o+r /web_server_logs
 
+# Create the ipython default profile volume as a directory
+RUN mkdir -p /.ipython \
+    && chown django:django /.ipython \
+    && chmod -R o+r /.ipython
+
 # Change the directories into volumes
-VOLUME /static_files /media_files /personal_files /web_server_logs /supervisor.d
+VOLUME /static_files /media_files /personal_files /web_server_logs /supervisor.d /.ipython
 
 # Copy the supervisord.conf file over to the container
 COPY ./supervisord.conf ./supervisord.conf
@@ -76,6 +81,7 @@ RUN chown django:django ./supervisord.conf \
 
 # Define environment variables
 ENV PYTHONPATH="/omniport:/omniport/core:/omniport/services:/omniport/apps"
+ENV IPYTHONDIR="/.ipython/"
 
 # Add some terminal jazz
 RUN echo "PS1='docker@\$NAME:\w\$ '" >> /etc/bash.bashrc

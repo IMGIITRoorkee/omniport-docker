@@ -332,6 +332,12 @@ services:
       target: /web_server_logs
       read_only: false
 
+      # mount '.ipython' as its namesake in the root of the container
+    - type: volume
+      source: .ipython
+      target: /.ipython
+      read_only: false
+
     # The services that need to be ready before this one
     depends_on:
     - database
@@ -420,6 +426,12 @@ services:
     - type: volume
       source: web_server_logs
       target: /web_server_logs
+      read_only: false
+
+      # Mount '.ipython' as its namesake in the root of the container
+    - type: volume
+      source: .ipython
+      target: /.ipython
       read_only: false
 
     # The services that need to be ready before this one
@@ -535,6 +547,9 @@ volumes:
 
   # This volume contains the supervisor.d conf files
   supervisor.d:
+
+  # This volume contains the ipython default profile files
+  .ipython:
 
   # RabbitMQ needs a volume at /var/lib/rabbitmq/
   rabbitmq_data:
