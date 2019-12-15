@@ -80,7 +80,7 @@ RUN chown django:django ./supervisord.conf \
 
 # Define environment variables
 ENV PYTHONPATH="/omniport:/omniport/core:/omniport/services:/omniport/apps"
-ENV HISTFILE="/.history/.bashrc"
+ENV HISTFILE="/.history/.bash_history"
 ENV IPYTHONDIR="/.history/.ipython/"
 
 # Add some terminal jazz
