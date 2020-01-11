@@ -147,6 +147,41 @@ services:
     networks:
     - network
 
+  verification-store: # Redis
+    # Use the Redis image we made ourselves by running ./scripts/build/redis.sh
+    image: omniport-redis:latest
+
+    # Check the health of the container periodically
+    healthcheck:
+      test: ['CMD', 'checkhealth']
+      retries: 4
+
+      interval: 16m
+      timeout: 16s
+      start_period: 2m
+
+    # No matter what, if the container stops, start it again
+    restart: always
+
+    # Expose the port 6379 used by Redis to other containers
+    expose:
+    - "6379"
+
+    # Run the container as the non-root user
+    user: redis
+
+    # Mount the volumes on the session store container
+    volumes:
+      # Mount 'verification_store' as the place where Redis stores all its dumps
+    - type: volume
+      source: verification_store
+      target: /data
+      read_only: false
+
+    # Connect to the custom default network
+    networks:
+    - network
+
   redis-gui: # Redis Commander
     # Use the Redis Commander image as is
     image: rediscommander/redis-commander:latest
@@ -172,13 +207,15 @@ services:
     - 'REDIS_HOSTS=
       channel-layer:channel-layer,
       session-store:session-store,
-      communication-store:communication-store'
+      communication-store:communication-store,
+      verification-store:verification-store'
 
     # The services that need to be ready before this one
     depends_on:
     - channel-layer
     - session-store
     - communication-store
+    - verification-store
 
     # Connect to the custom default network
     networks:
@@ -560,6 +597,8 @@ volumes:
   session_store:
   # Periodic dumps taken by Redis acting as communication store
   communication_store:
+  # Periodic dumps taken by Redis acting as verification store
+  verification_store:
 
 # Networks specify how containers communicate with each other and the host
 networks:
