@@ -11,9 +11,17 @@ ARG IMAGETYPE
 RUN groupadd --system django && useradd --system --gid django django
 
 # Install dependencies
+RUN echo 'deb [ trusted=yes ] http://www.deb-multimedia.org stretch main non-free' >> /etc/apt/sources.list
+
 RUN apt-get update \
-    && apt-get install -y gcc \
+    && apt-get install -y \ 
+    gcc deb-multimedia-keyring \
     && rm -rf /var/lib/apt/lists/*
+
+# Install ffmpeg for video compression
+RUN apt-get update && \
+    apt-get -y install ffmpeg && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install pip packages
 RUN pip install --upgrade pip \
