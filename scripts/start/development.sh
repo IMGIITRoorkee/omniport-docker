@@ -4,4 +4,5 @@
 docker-compose up -d \
     database \
     redis-gui \
-    cache
+    cache\
+    message-broker
