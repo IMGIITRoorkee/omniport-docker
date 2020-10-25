@@ -553,10 +553,6 @@ services:
     - intranet-server
     - internet-server
 
-    # Connect to the custom default network
-    networks:
-    - network
-
 # Volumes are virtual drives connected to containers
 volumes:
   # This volume contains the database and PostgreSQL configuration files
