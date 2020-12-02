@@ -500,10 +500,6 @@ services:
     - "80:80"
     - "443:443"
 
-    # Connect to the custom default network
-    networks:
-    - network
-
     # Mount the volumes on the NGINX container
     volumes:
       # Mount the imagery from the 'branding' folder in the root of the container
