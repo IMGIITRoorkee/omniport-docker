@@ -339,10 +339,10 @@ services:
       target: /certificates
       read_only: true
 
-      # Mount an externally attached storage form the 'external_storage' folder in the root of the container
+      # Mount 'network_storage' as 'network_storage' in the root of the container
     - type: bind
-      source: ./codebase/omniport-backend/external_storage
-      target: /external_storage
+      source: ./codebase/omniport-backend/network_storage
+      target: /network_storage
       read_only: false
 
       # Mount 'static_files' as its namesake in the root of the container
@@ -441,10 +441,10 @@ services:
       target: /certificates
       read_only: true
 
-      # Mount an externally attached storage form the 'external_storage' folder in the root of the container
+      # Mount a network storage form the 'network_storage' folder in the root of the container
     - type: bind
-      source: ./codebase/omniport-backend/external_storage
-      target: /external_storage
+      source: ./codebase/omniport-backend/network_storage
+      target: /network_storage
       read_only: false
 
       # Mount 'static_files' as its namesake in the root of the container
@@ -530,11 +530,11 @@ services:
       target: /frontend
       read_only: true
 
-      # Mount 'external_storage' as 'external_storage' in the root of the container
+      # Mount 'network_storage' as 'network_storage' in the root of the container
     - type: bind
-      source: ./codebase/omniport-backend/external_storage
-      target: /external_storage
-      read_only: false
+      source: ./codebase/omniport-backend/network_storage
+      target: /network_storage
+      read_only: true
 
       # Mount 'cert' as 'cert' in the root of the container
     - type: bind
