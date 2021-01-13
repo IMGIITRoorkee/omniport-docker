@@ -12,6 +12,9 @@ if [ $REBUILD == 'Y' -o $REBUILD == 'y' ]; then
     read -p "Enter timeout value for internet server (in seconds) [60]: " INTERNET_TIMEOUT
     INTERNET_TIMEOUT=${INTERNET_TIMEOUT:-60}
 
+    read -p "Enter max upload size [63M]: " MAX_UPLOAD_SIZE
+    MAX_UPLOAD_SIZE=${MAX_UPLOAD_SIZE:-63M}
+
     # Choose whether to enable SSL in the NGINX conf
     read -p "Enable HTTPS? [y/N]: " HTTPS
     if [ $HTTPS == 'Y' -o $HTTPS == 'y' ]; then
@@ -63,6 +66,7 @@ if [ $REBUILD == 'Y' -o $REBUILD == 'y' ]; then
     sed -i "s/\[\[main_port\]\]/${MAIN_PORT}/g" 01-intranet.conf
     sed -i "s/\[\[domain\]\]/${INTRANET_DOMAIN}/g" 01-intranet.conf
     sed -i "s/\[\[enable_ssl\]\]/${ENABLE_SSL}/g" 01-intranet.conf
+    sed -i "s/\[\[max_upload_size\]\]/${MAX_UPLOAD_SIZE}/g" 01-intranet.conf
     printf "done\n"
 
     printf "Writing Internet application file... "
@@ -94,6 +98,7 @@ if [ $REBUILD == 'Y' -o $REBUILD == 'y' ]; then
     sed -i "s/\[\[main_port\]\]/${MAIN_PORT}/g" 02-internet.conf
     sed -i "s/\[\[domain\]\]/${INTERNET_DOMAIN}/g" 02-internet.conf
     sed -i "s/\[\[enable_ssl\]\]/${ENABLE_SSL}/g" 02-internet.conf
+    sed -i "s/\[\[max_upload_size\]\]/${MAX_UPLOAD_SIZE}/g" 02-internet.conf
     printf "done\n"
 
     # Get back out
