@@ -7,6 +7,10 @@ read -p "Rebuild NGINX .conf files? (y/N): " REBUILD
 if [ $REBUILD == 'Y' -o $REBUILD == 'y' ]; then
     read -p "Enter the intranet-side domain as 'omniport.intranet': " INTRANET_DOMAIN
     read -p "Enter the Internet-side domain as 'omniport.internet': " INTERNET_DOMAIN
+    read -p "Enter timeout value for intranet server (in seconds) [60]: " INTRANET_TIMEOUT
+    INTRANET_TIMEOUT=${INTRANET_TIMEOUT:-60}
+    read -p "Enter timeout value for internet server (in seconds) [60]: " INTERNET_TIMEOUT
+    INTERNET_TIMEOUT=${INTERNET_TIMEOUT:-60}
 
     # Choose whether to enable SSL in the NGINX conf
     read -p "Enable HTTPS? [y/N]: " HTTPS
@@ -33,6 +37,7 @@ if [ $REBUILD == 'Y' -o $REBUILD == 'y' ]; then
     printf "Writing intranet application file... "
     cp stencils/application.conf includes/01-application.conf
     sed -i "s/\[\[side\]\]/intranet/g" includes/01-application.conf
+    sed -i "s/\[\[timeout\]\]/${INTRANET_TIMEOUT}/g" includes/01-application.conf
     printf "done\n"
 
     printf "Writing intranet http_redirect file... "
@@ -63,6 +68,7 @@ if [ $REBUILD == 'Y' -o $REBUILD == 'y' ]; then
     printf "Writing Internet application file... "
     cp stencils/application.conf includes/02-application.conf
     sed -i "s/\[\[side\]\]/internet/g" includes/02-application.conf
+    sed -i "s/\[\[timeout\]\]/${INTERNET_TIMEOUT}/g" includes/02-application.conf
     printf "done\n"
 
     printf "Writing Internet http_redirect file... "
