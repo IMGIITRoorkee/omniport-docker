@@ -182,6 +182,41 @@ services:
     networks:
     - network
 
+  application-store: # Redis
+    # Use the Redis image we made ourselves by running ./scripts/build/redis.sh
+    image: omniport-redis:latest
+
+    # Check the health of the container periodically
+    healthcheck:
+      test: ['CMD', 'checkhealth']
+      retries: 4
+
+      interval: 16m
+      timeout: 16s
+      start_period: 2m
+
+    # No matter what, if the container stops, start it again
+    restart: always
+
+    # Expose the port 6379 used by Redis to other containers
+    expose:
+    - "6379"
+
+    # Run the container as the non-root user
+    user: redis
+
+    # Mount the volumes on the application store container
+    volumes:
+      # Mount 'application_store' as the place where Redis stores all its dumps
+    - type: volume
+      source: application_store
+      target: /data
+      read_only: false
+
+    # Connect to the custom default network
+    networks:
+    - network
+
   redis-gui: # Redis Commander
     # Use the Redis Commander image as is
     image: rediscommander/redis-commander:latest
@@ -208,6 +243,7 @@ services:
       channel-layer:channel-layer,
       session-store:session-store,
       communication-store:communication-store,
+      application-store:application-store,
       verification-store:verification-store'
 
     # The services that need to be ready before this one
@@ -387,6 +423,7 @@ services:
     - channel-layer
     - session-store
     - communication-store
+    - application-store
     - message-broker
 
     # Connect to the custom default network
@@ -489,6 +526,7 @@ services:
     - channel-layer
     - session-store
     - communication-store
+    - application-store
     - message-broker
 
     # Connect to the custom default network
@@ -613,6 +651,8 @@ volumes:
   communication_store:
   # Periodic dumps taken by Redis acting as verification store
   verification_store:
+  # Periodic dumps taken by Redis acting as application store
+  application_store:
 
 # Networks specify how containers communicate with each other and the host
 networks:
