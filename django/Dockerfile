@@ -1,5 +1,5 @@
 # Use Python from the Debian Linux project
-FROM python:3.10-slim-bullseye
+FROM python:3.10.2-slim-bullseye
 
 # Add labels for metadata
 LABEL maintainer="Dhruv Bhanushali <https://dhruvkb.github.io/>"
