@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Copy the prod-requirements.txt file from the codebase into the Django Docker folder
-cp codebase/omniport-backend/Pipfile      django/
-cp codebase/omniport-backend/Pipfile.lock django/
+cp codebase/omniport-backend/pyproject.toml django/
+cp codebase/omniport-backend/poetry.lock django/
 
 read -p "Add PyPI dependencies for developer tools? (y/N): " DEV_TOOLS
 if [ $DEV_TOOLS == 'Y' -o $DEV_TOOLS == 'y' ]; then
@@ -33,5 +33,5 @@ docker build \
     .
 
 # Remove the requirement files after they have served their purpose
-rm Pipfile
-rm Pipfile.lock
+rm pyproject.toml
+rm poetry.lock

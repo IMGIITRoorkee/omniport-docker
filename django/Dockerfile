@@ -14,26 +14,32 @@ RUN groupadd --system django && useradd --system --gid django django
 RUN apt-get update \
     && apt-get install -y build-essential gcc libcairo2 libffi-dev \
         libgdk-pixbuf2.0-0 libpango-1.0-0 libpangocairo-1.0-0 poppler-utils \
-        python3-cffi shared-mime-info \
+        python3-cffi shared-mime-info curl\
     && rm -rf /var/lib/apt/lists/*
 
 # Install pip packages
 RUN pip install --upgrade pip \
     && pip install --upgrade setuptools \
-    && pip install --upgrade pipenv \
     && pip install --upgrade supervisor
+
+# Install poetry for dependency management
+RUN curl -sSL https://install.python-poetry.org | python3 -
+
+# Add poetry to PATH
+ENV PATH="/root/.local/bin:$PATH"
 
 # Work in the root directory of the container
 WORKDIR /
 
 # Copy the file Pipfile.lock over to the container
 # This command implies an image rebuild when PyPI requirements change
-COPY ./Pipfile ./Pipfile
-COPY ./Pipfile.lock ./Pipfile.lock
+COPY ./pyproject.toml ./pyproject.toml
+COPY ./poetry.lock ./poetry.lock
 
 # Install dependencies from the file Pipfile.lock
 # Depending on build args, dev packages may not be installed
-RUN pipenv install --deploy --system ${IMAGETYPE}
+RUN poetry config virtualenvs.create false \
+ && poetry install
 
 # Create the static files volume as a directory
 RUN mkdir -p /static_files \
