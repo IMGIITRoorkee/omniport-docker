@@ -9,7 +9,7 @@ LABEL maintainer="Dhruv Bhanushali <https://dhruvkb.github.io/>"
 
 # Install dependencies
 RUN apt-get update \
-    && apt-get install -y netcat \
+    && apt-get install -y netcat-traditional \
     && rm -rf /var/lib/apt/lists/*
 
 # Undo our undoing of Memcache's misdeeds, just in case they are important
