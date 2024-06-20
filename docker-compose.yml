@@ -609,6 +609,39 @@ services:
     networks:
     - network
 
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+    container_name: elastic
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    expose:
+    - "9200"
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    healthcheck:
+      test: ["CMD-SHELL", "curl --silent --fail localhost:9200/_cluster/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+    networks:
+      - network
+  # elasticsearch:
+  #   image: elasticsearch:8.8.0
+  #   container_name: elastic
+  #   ports:
+  #     - "9200"
+  #     - "9300"
+  #   expose:
+  #   - "9200"
+  #   - "9300"
+  #   environment:
+  #     - discovery.type=single-node
+  #     - xpack.security.enabled=false
+  #   networks:
+  #   - network
+
 # Volumes are virtual drives connected to containers
 volumes:
   # This volume contains the database and PostgreSQL configuration files
