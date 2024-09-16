@@ -625,22 +625,14 @@ services:
       interval: 10s
       timeout: 10s
       retries: 3
+    volumes:
+      #Mount 'esdata' as the place where ElasticSearch stores its data
+    - type: volume
+      source: esdata
+      target: /usr/share/elasticsearch/data
+      read_only: false
     networks:
-      - network
-  # elasticsearch:
-  #   image: elasticsearch:8.8.0
-  #   container_name: elastic
-  #   ports:
-  #     - "9200"
-  #     - "9300"
-  #   expose:
-  #   - "9200"
-  #   - "9300"
-  #   environment:
-  #     - discovery.type=single-node
-  #     - xpack.security.enabled=false
-  #   networks:
-  #   - network
+      - network      
 
 # Volumes are virtual drives connected to containers
 volumes:
@@ -675,6 +667,9 @@ volumes:
 
   # RabbitMQ needs a volume at /var/lib/rabbitmq/
   rabbitmq_data:
+
+  # ElasticSearch needs a volume at /usr/share/elasticsearch/data
+  esdata:
 
   # Periodic dumps taken by Redis acting as channel layer
   channel_layer:
