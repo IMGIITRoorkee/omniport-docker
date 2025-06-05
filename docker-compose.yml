@@ -616,23 +616,42 @@ services:
       - "9200:9200"
       - "9300:9300"
     expose:
-    - "9200"
+      - "9200"
     environment:
       - discovery.type=single-node
-      - xpack.security.enabled=false
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=true
+      - xpack.security.http.ssl.keystore.path=/usr/share/elasticsearch/config/certs/elastic-certificates.p12
+      - xpack.security.http.ssl.keystore.password=testpassword
+      - xpack.security.transport.ssl.enabled=true
+      - xpack.security.transport.ssl.verification_mode=certificate
+      - xpack.security.transport.ssl.keystore.path=/usr/share/elasticsearch/config/certs/elastic-certificates.p12
+      - xpack.security.transport.ssl.keystore.password=testpassword
+      - xpack.security.transport.ssl.truststore.path=/usr/share/elasticsearch/config/certs/elastic-certificates.p12
+      - xpack.security.transport.ssl.truststore.password=testpassword
+      - ELASTIC_PASSWORD=testpassword
     healthcheck:
-      test: ["CMD-SHELL", "curl --silent --fail localhost:9200/_cluster/health || exit 1"]
+      test:
+        [
+          "CMD-SHELL",
+          "curl --silent --fail --cacert /usr/share/elasticsearch/config/certs/elastic-stack-ca.p12 https://localhost:9200/_cluster/health || exit 1",
+        ]
       interval: 10s
       timeout: 10s
       retries: 3
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
     volumes:
-      #Mount 'esdata' as the place where ElasticSearch stores its data
-    - type: volume
-      source: esdata
-      target: /usr/share/elasticsearch/data
-      read_only: false
+      - type: volume
+        source: esdata
+        target: /usr/share/elasticsearch/data
+        read_only: false
+      - ./elasticsearch/certs:/usr/share/elasticsearch/config/certs:ro
+      - ./elasticsearch/logs:/usr/share/elasticsearch/logs:rw
     networks:
-      - network      
+      - network
 
 # Volumes are virtual drives connected to containers
 volumes:
