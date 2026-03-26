@@ -5,4 +5,5 @@ docker-compose up -d \
     database \
     redis-gui \
     cache \
-    message-broker
+    message-broker \
+    elasticsearch

@@ -39,7 +39,7 @@ COPY ./poetry.lock ./poetry.lock
 # Install dependencies from the file Pipfile.lock
 # Depending on build args, dev packages may not be installed
 RUN poetry config virtualenvs.create false \
- && poetry install
+ && poetry install --no-root
 
 # Create the static files volume as a directory
 RUN mkdir -p /static_files \
