@@ -6,3 +6,6 @@
 
 # Codebase (backend and frontend)
 codebase/
+
+# Local docker-compose overrides (per-developer, not committed)
+docker-compose.override.yml

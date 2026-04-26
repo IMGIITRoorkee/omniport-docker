@@ -1,0 +1,65 @@
+# Example docker-compose override for local development.
+#
+# Copy this file to `docker-compose.override.yml` (which is git-ignored) to
+# automatically merge it into the main compose file when running
+# `docker-compose up`. Each developer can keep their own overrides locally
+# without committing changes to the canonical compose definition.
+#
+# This example adds an Elasticsearch single-node sidecar so the noticeboard
+# search code has a backend to talk to without provisioning a separate VM.
+#
+# DO NOT use this configuration in production. Production Elasticsearch must
+# run on a dedicated host with TLS and authentication enabled, and the stack
+# should point at it via ELASTICSEARCH_HOST in noticeboard/elasticsearch.env.
+
+version: '3.4'
+
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+    restart: always
+
+    # Bind the host port to localhost only. Public binding (`9200:9200`)
+    # would expose the cluster to the internet — unsafe with security off.
+    ports:
+    - "127.0.0.1:9200:9200"
+
+    expose:
+    - "9200"
+
+    environment:
+    # Single-node cluster, no peers, no production-grade discovery.
+    - discovery.type=single-node
+    # Disable security so we don't have to manage credentials in dev.
+    # Acceptable ONLY because the host port is bound to 127.0.0.1.
+    - xpack.security.enabled=false
+    # Cap JVM heap so ES doesn't starve the rest of the stack on small dev
+    # machines. Adjust if you have spare memory.
+    - ES_JAVA_OPTS=-Xms512m -Xmx512m
+
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:9200/_cluster/health | grep -vq '\"status\":\"red\"'"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
+
+    volumes:
+    - type: volume
+      source: esdata
+      target: /usr/share/elasticsearch/data
+      read_only: false
+
+    networks:
+    - network
+
+  intranet-server:
+    depends_on:
+    - elasticsearch
+
+  internet-server:
+    depends_on:
+    - elasticsearch
+
+volumes:
+  esdata:
