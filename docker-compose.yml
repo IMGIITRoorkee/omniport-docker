@@ -233,10 +233,6 @@ services:
     # No matter what, if the container stops, start it again
     restart: always 
     
-    # Expose the port 8081 used by Redis commander to the host
-    ports:
-    - "8081:8081"
-
     # Set the REDIS_HOSTS environment variable so that the Redis servers can be connected
     environment:
     - 'REDIS_HOSTS=
@@ -303,10 +299,6 @@ services:
     # Expose the port 5672 used by RabbitMQ to other containers
     expose:
     - "5672"
-
-    # Expose the ports 15672 to the host at 5672 and 15672
-    ports:
-    - "15672:15672"
 
     # Run the container as the non-root user
     user: rabbitmq
