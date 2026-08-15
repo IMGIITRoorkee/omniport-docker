@@ -347,6 +347,10 @@ services:
     - SITE_ID=1
     - NAME=intranet-server
 
+    # Set the noticeboard Elasticsearch connection settings
+    env_file:
+    - noticeboard/elasticsearch.env
+
     command: ["supervisord", "-c", "/supervisord.conf"]
 
     # Mount the volumes on the Django container
@@ -449,6 +453,10 @@ services:
     environment:
     - SITE_ID=2
     - NAME=internet-server
+
+    # Set the noticeboard Elasticsearch connection settings
+    env_file:
+    - noticeboard/elasticsearch.env
 
     command: ["supervisord", "-c", "/supervisord.conf"]
 
