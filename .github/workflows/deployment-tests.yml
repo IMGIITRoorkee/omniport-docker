@@ -1,0 +1,23 @@
+name: deployment test script
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  self-test:
+    name: The deployment test script still discriminates
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    # Stands up a mock deployment in a vulnerable and a fixed configuration
+    # and runs the real script against each, so the script cannot rot into
+    # one that passes on anything.
+    - name: Run the script against both configurations
+      run: python -m unittest tests.test_security_fixes_script --verbose
