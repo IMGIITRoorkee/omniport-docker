@@ -94,6 +94,41 @@ port_is_open() {
     esac
 }
 
+# Obtain a session by logging in, when credentials are supplied. Saves pasting
+# a cookie out of a browser, which is not always possible for whoever is
+# running this.
+obtain_session() {
+    if [ -n "$SESSION_COOKIE" ]; then
+        return 0
+    fi
+    if [ -z "$STAGING_USER" ] || [ -z "$STAGING_PASSWORD" ]; then
+        return 1
+    fi
+
+    local jar token session
+    jar=$(mktemp)
+
+    curl -s -o /dev/null -c "$jar" --max-time 20 \
+        "$BASE_URL/api/ensure_csrf/" 2>/dev/null
+    token=$(awk '$6 == "csrftoken" {print $7}' "$jar" | tail -1)
+
+    curl -s -o /dev/null -b "$jar" -c "$jar" --max-time 20 \
+        -H "Content-Type: application/json" \
+        -H "X-CSRFToken: $token" \
+        -H "Referer: $BASE_URL/" \
+        -d "{\"username\": \"$STAGING_USER\", \"password\": \"$STAGING_PASSWORD\"}" \
+        "$BASE_URL/api/session_auth/login/" 2>/dev/null
+
+    session=$(awk '$6 == "sessionid" {print $7}' "$jar" | tail -1)
+    rm -f "$jar"
+
+    if [ -n "$session" ]; then
+        SESSION_COOKIE="sessionid=$session"
+        return 0
+    fi
+    return 1
+}
+
 # ---------------------------------------------------------------------------
 # F-NEW-15 - omniport-docker#58 - Redis Commander removed
 # ---------------------------------------------------------------------------
@@ -344,6 +379,14 @@ print_summary() {
         echo -e "passed. Read them before treating this as a clean result.${NC}"
     fi
 
+    if [ $total -eq 0 ]; then
+        echo -e "\n${YELLOW}${BOLD}⚠ NO CHECKS RAN${NC}"
+        echo -e "${YELLOW}Every check was skipped, so nothing was verified. That is"
+        echo -e "not a pass, and this exits non-zero so a pipeline cannot read it"
+        echo -e "as one.${NC}\n"
+        return 1
+    fi
+
     if [ $FAILED -eq 0 ]; then
         echo -e "\n${GREEN}${BOLD}✓ ALL TESTS PASSED!${NC}"
         echo -e "${GREEN}Security fixes are working correctly${NC}\n"
@@ -385,6 +428,16 @@ main() {
             echo -e "${YELLOW}Make sure the server is running and URL is correct${NC}\n"
             exit 1
         fi
+    fi
+
+    if obtain_session; then
+        if [ -n "$STAGING_USER" ]; then
+            echo -e "${BOLD}Session:${NC} obtained by logging in as $STAGING_USER\n"
+        fi
+    elif [ -n "$STAGING_USER" ]; then
+        echo -e "${YELLOW}Could not log in as $STAGING_USER; authenticated checks"
+        echo -e "will be skipped. Check the credentials and that"
+        echo -e "$BASE_URL/api/session_auth/login/ is reachable.${NC}\n"
     fi
 
     case "$SECTION" in

@@ -170,5 +170,27 @@ class TestItPassesOnAFixedDeployment(unittest.TestCase):
         self.assertIn('WARN', output)
 
 
+class TestARunThatCheckedNothingIsNotAPass(unittest.TestCase):
+    """
+    The script warns that warnings are not passes, and then reported success
+    on a run where every check was skipped. This is that regression.
+    """
+
+    def test_a_section_that_skips_everything_exits_non_zero(self):
+        # The pillow section reads a version out of a container. Where there is
+        # no reachable container it warns and asserts nothing at all.
+        with MockDeployment('fixed', FIXED_PORT) as deployment:
+            code, output = deployment.run_script('pillow')
+
+        self.assertIn('Total Tests: 0', output)
+        self.assertNotIn('ALL TESTS PASSED', output)
+        self.assertIn('NO CHECKS RAN', output)
+        self.assertNotEqual(
+            code, 0,
+            'a run that verified nothing exited 0, so a pipeline would read it '
+            'as a pass'
+        )
+
+
 if __name__ == '__main__':
     unittest.main()
