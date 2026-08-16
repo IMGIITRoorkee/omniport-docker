@@ -3,15 +3,21 @@ Tests for the service definitions in docker-compose.yml
 """
 
 import pathlib
+import shlex
 import unittest
 
 import yaml
 
-COMPOSE = pathlib.Path(__file__).resolve().parent.parent / 'docker-compose.yml'
+ROOT = pathlib.Path(__file__).resolve().parent.parent
+COMPOSE = ROOT / 'docker-compose.yml'
+STARTUP_SCRIPT = ROOT / 'scripts' / 'start' / 'development.sh'
 
 # Ports that must never be published to the host. Each entry is the container
 # port and the reason it is forbidden, which is printed on failure so that
 # whoever trips the test knows why the rule exists.
+#
+# 15672, the RabbitMQ console, is knowingly not on this list: it is credentialed
+# from a deployment env file, and unpublishing it is an operator-facing change.
 FORBIDDEN_PUBLISHED_PORTS = {
     '8081': (
         'Redis Commander. It ships with no credentials, and REDIS_HOSTS gave '
@@ -67,9 +73,9 @@ class ComposeFileTestCase(unittest.TestCase):
         return published
 
 
-class TestNoAdminConsoleIsPublished(ComposeFileTestCase):
+class TestForbiddenPortsAndServices(ComposeFileTestCase):
     """
-    The deployment must not publish an unauthenticated admin surface
+    No forbidden port reaches the host and Redis Commander is not defined
     """
 
     def test_redis_commander_service_is_absent(self):
@@ -102,6 +108,51 @@ class TestNoAdminConsoleIsPublished(ComposeFileTestCase):
                     f'the service {name!r} publishes port {port} to the host. '
                     f'{reason}'
                 )
+
+
+class TestStartupScriptNamesRealServices(ComposeFileTestCase):
+    """
+    The bootstrap script must only name services the compose file defines
+    """
+
+    @staticmethod
+    def named_services(source):
+        """
+        Return the service names a shell script passes to `docker-compose up`
+
+        The line continuations are joined first because `shlex` keeps the
+        escaped newline as a token of its own.
+        """
+
+        tokens = shlex.split(source.replace('\\\n', ' '), comments=True)
+        if 'up' not in tokens:
+            return []
+
+        return [
+            token
+            for token in tokens[tokens.index('up') + 1:]
+            if not token.startswith('-')
+        ]
+
+    def test_the_development_script_names_only_defined_services(self):
+        """
+        Compose resolves every name before it starts anything, so one stale
+        name aborts the command and nothing at all comes up
+        """
+
+        named = self.named_services(STARTUP_SCRIPT.read_text())
+        self.assertTrue(
+            named,
+            f'no service names were found in {STARTUP_SCRIPT.name}, so this '
+            f'test is not checking anything'
+        )
+
+        unknown = [name for name in named if name not in self.services]
+        self.assertFalse(
+            unknown,
+            f'{STARTUP_SCRIPT.name} starts {unknown}, which the compose file '
+            f'does not define'
+        )
 
 
 class TestComposeFileIsWellFormed(ComposeFileTestCase):
