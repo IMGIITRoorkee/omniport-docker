@@ -1,0 +1,22 @@
+name: pr verification script
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  self-test:
+    name: The PR verification script still discriminates
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    # Runs the real script against a mock deployment in both a fixed and a
+    # vulnerable configuration, so it cannot rot into one that passes anywhere.
+    - name: Run the script against both configurations
+      run: python -m unittest tests.test_pr_verification_script --verbose

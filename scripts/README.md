@@ -18,3 +18,5 @@ Folder structure:
         - a name for the container, defaults to `logs-prod`
 - clean/
     - `unclone.sh`: Removes the `omniport/` directory from the root directory. This will remove the Omniport core, the shell, all services and any apps you might have cloned into the code base.
+    - `pr_verification.sh`: Verify the open security pull requests against a running deployment, one section per PR. Takes the base URL as its first argument and an optional section name as its second; `list` prints the section names. Set `SESSION_COOKIE` to run the checks that need a logged-in caller, and `DJANGO_SERVICE` for the dependency check. Exits non-zero if any check fails.
+
