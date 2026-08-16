@@ -69,6 +69,40 @@ pass()  { echo -e "  ${GREEN}✓ PASS${NC} $1"; ((PASSED++)); }
 fail()  { echo -e "  ${RED}✗ FAIL${NC} $1"; ((FAILED++)); }
 warn()  { echo -e "  ${YELLOW}⚠ WARN${NC} $1"; ((WARNINGS++)); }
 
+# Obtain a session by logging in, when credentials are supplied. Saves pasting
+# a cookie out of a browser, which is not always possible for whoever is
+# running this.
+obtain_session() {
+    if [ -n "$SESSION_COOKIE" ]; then
+        return 0
+    fi
+    if [ -z "$STAGING_USER" ] || [ -z "$STAGING_PASSWORD" ]; then
+        return 1
+    fi
+
+    local jar token session
+    jar=$(mktemp)
+
+    curl -s -o /dev/null -c "$jar" --max-time 20 "$API/ensure_csrf/" 2>/dev/null
+    token=$(awk '$6 == "csrftoken" {print $7}' "$jar" | tail -1)
+
+    curl -s -o /dev/null -b "$jar" -c "$jar" --max-time 20 \
+        -H "Content-Type: application/json" \
+        -H "X-CSRFToken: $token" \
+        -H "Referer: $BASE_URL/" \
+        -d "{\"username\": \"$STAGING_USER\", \"password\": \"$STAGING_PASSWORD\"}" \
+        "$API/session_auth/login/" 2>/dev/null
+
+    session=$(awk '$6 == "sessionid" {print $7}' "$jar" | tail -1)
+    rm -f "$jar"
+
+    if [ -n "$session" ]; then
+        SESSION_COOKIE="sessionid=$session"
+        return 0
+    fi
+    return 1
+}
+
 need_session() {
     if [ -z "$SESSION_COOKIE" ]; then
         warn "$1 needs a logged-in caller; set SESSION_COOKIE to run it"
@@ -688,6 +722,14 @@ print_summary() {
         echo -e "treating this as a clean result.${NC}"
     fi
 
+    if [ $total -eq 0 ]; then
+        echo -e "\n${YELLOW}${BOLD}⚠ NO CHECKS RAN${NC}"
+        echo -e "${YELLOW}Every check was skipped, so nothing was verified. That is"
+        echo -e "not a pass, and this exits non-zero so a pipeline cannot read it"
+        echo -e "as one.${NC}\n"
+        return 1
+    fi
+
     if [ $FAILED -eq 0 ]; then
         echo -e "\n${GREEN}${BOLD}✓ ALL TESTS PASSED!${NC}\n"
         return 0
@@ -719,6 +761,7 @@ main() {
 
     echo -e "${BOLD}Testing against:${NC} $BASE_URL"
     echo -e "${BOLD}Section:${NC} $SECTION"
+    obtain_session || true
     if [ -n "$SESSION_COOKIE" ]; then
         echo -e "${BOLD}Session:${NC} provided"
     else
