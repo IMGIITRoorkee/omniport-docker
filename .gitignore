@@ -6,3 +6,6 @@
 
 # Codebase (backend and frontend)
 codebase/
+# Python bytecode
+__pycache__/
+*.py[cod]
