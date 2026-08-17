@@ -342,36 +342,47 @@ class TestContentSecurityPolicy(unittest.TestCase):
     def test_the_locked_down_directives_are_enforced(self):
         """
         The directives with nothing to lose must be enforced, not reported
+
+        Asserted per fragment. NGINX serves whichever fragment the matching
+        location includes and no other, so a second one carrying only the
+        Report-Only header would leave every response served through it with
+        nothing enforced, while a check that merged the fragments still passed.
         """
 
-        enforced = {
-            name: sources
-            for _, header, directives in policies()
-            if header == ENFORCED_HEADER
-            for name, sources in directives.items()
-        }
-        for name, expected in DIRECTIVES_THAT_MUST_BE_ENFORCED.items():
-            self.assertEqual(
-                enforced.get(name), [expected],
-                f'{name} is not enforced as {expected}. It cannot break a page '
-                f'by being wrong, so it does not belong in Report-Only.'
-            )
+        for path in security_conf_files():
+            headers = parse_headers(path)
+            if not any(name in headers for name in POLICY_HEADERS):
+                continue
+
+            enforced = parse_csp(headers.get(ENFORCED_HEADER, ''))
+            for name, expected in DIRECTIVES_THAT_MUST_BE_ENFORCED.items():
+                self.assertEqual(
+                    enforced.get(name), [expected],
+                    f'{path.name}: {name} is not enforced as {expected}. It '
+                    f'cannot break a page by being wrong, so it does not '
+                    f'belong in Report-Only, and a response served through '
+                    f'this fragment gets no other policy.'
+                )
 
     def test_a_default_src_of_self_is_served(self):
         """
         Anything not named by a more specific directive falls back to 'self'
         """
 
-        defaults = [
-            directives.get('default-src')
-            for _, _, directives in policies()
-            if 'default-src' in directives
-        ]
-        self.assertIn(
-            ["'self'"], defaults,
-            "no policy sets default-src 'self', so a directive nobody thought "
-            'of inherits a wide default'
-        )
+        for path in security_conf_files():
+            headers = parse_headers(path)
+            if not any(name in headers for name in POLICY_HEADERS):
+                continue
+
+            defaults = [
+                parse_csp(headers[name]).get('default-src')
+                for name in POLICY_HEADERS if name in headers
+            ]
+            self.assertIn(
+                ["'self'"], defaults,
+                f"{path.name}: no policy it serves sets default-src 'self', so "
+                f'a directive nobody thought of inherits a wide default'
+            )
 
     def test_form_action_is_not_set(self):
         """
