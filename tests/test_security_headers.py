@@ -20,8 +20,15 @@ POLICY_HEADERS = (ENFORCED_HEADER, REPORTED_HEADER)
 SELF_ORIGIN = 'https://channeli.in'
 
 # A source that lets an injected tag reach an origin nobody vetted: `*`, a
-# bare scheme such as `https:`, or a wildcard host such as `*.example.com`.
-BROAD_SOURCE = re.compile(r"^(\*|\*\.[^\s]+|[a-z][a-z0-9+.-]*:)$")
+# bare scheme such as `https:`, a wildcard host such as `*.example.com`, or a
+# scheme carrying one such as `https://*`.
+BROAD_SOURCE = re.compile(
+    r"^(\*"
+    r"|\*\.[^\s]+"
+    r"|[a-z][a-z0-9+.-]*:"
+    r"|[a-z][a-z0-9+.-]*://\*(\.[^\s]+)?"
+    r")$"
+)
 
 # The broad sources that are deliberate, per directive. Everything else is a
 # regression back towards the wildcard policy this replaced.
