@@ -1,0 +1,50 @@
+name: tests
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  python:
+    name: Configuration tests
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: pip install PyYAML
+
+    - name: Run the test suite
+      run: python -m unittest discover --start-directory tests --verbose
+
+  nginx:
+    name: NGINX configuration syntax
+    runs-on: ubuntu-latest
+    container: nginx:alpine
+    steps:
+    - uses: actions/checkout@v4
+
+    # The include files are fragments, so they are exercised inside a minimal
+    # server block rather than on their own. This is what catches an unquoted
+    # semicolon in a header value, which is otherwise only found on deploy.
+    - name: Check the include fragments parse
+      run: |
+        set -eu
+        for fragment in nginx/conf.d/includes/security*.conf; do
+          echo "checking ${fragment}"
+          cat > /tmp/test.conf <<EOF
+        events {}
+        http {
+          server {
+            listen 8080;
+            include $(pwd)/${fragment};
+          }
+        }
+        EOF
+          nginx -t -c /tmp/test.conf
+        done
