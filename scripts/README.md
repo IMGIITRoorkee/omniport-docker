@@ -18,3 +18,6 @@ Folder structure:
         - a name for the container, defaults to `logs-prod`
 - clean/
     - `unclone.sh`: Removes the `omniport/` directory from the root directory. This will remove the Omniport core, the shell, all services and any apps you might have cloned into the code base.
+- test/
+    - `security_fixes.sh`: Verify the deployed security fixes against a running deployment over HTTP. Takes the base URL as its first argument, defaulting to `http://localhost:8000`, and an optional section name as its second: `redis`, `csp`, `noticeboard`, `pillow` or `all`. Set `SESSION_COOKIE` to also check that a logged-in caller is still served, and `DJANGO_SERVICE` to name the compose service for the Pillow check. Exits non-zero if any check fails, so it can gate a deploy. Run it from a machine on the campus network rather than from the server itself, since a port bound to the host stays open to localhost either way.
+
