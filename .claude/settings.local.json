@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Users/ronitchawla/Developer/omniport/omniport-frontend-noticeboard/src/components/notice/**)"
+    ]
+  }
+}
