@@ -19,7 +19,7 @@ COPY ./package.json ./package.json
 COPY ./yarn.lock ./yarn.lock
 
 # Add webpack dependency
-RUN yarn global add webpack-dev-server
+RUN yarn global add webpack-dev-server@3.1.14
 
 # Install dependenices from the file yarn.lock
 RUN yarn install ${IMAGETYPE}
