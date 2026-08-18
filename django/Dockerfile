@@ -19,11 +19,11 @@ RUN apt-get update \
 
 # Install pip packages
 RUN pip install --upgrade pip \
-    && pip install --upgrade setuptools \
+    && pip install --upgrade "setuptools<82" \
     && pip install --upgrade supervisor
 
 # Install poetry for dependency management
-RUN curl -sSL https://install.python-poetry.org | python3 -
+RUN curl -sSL https://install.python-poetry.org | python3 - --version 1.8.5
 
 # Add poetry to PATH
 ENV PATH="/root/.local/bin:$PATH"
