@@ -569,6 +569,31 @@ services:
     networks:
     - network
 
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+    container_name: elastic
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    expose:
+    - "9200"
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    healthcheck:
+      test: ["CMD-SHELL", "curl --silent --fail localhost:9200/_cluster/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+    volumes:
+      #Mount 'esdata' as the place where ElasticSearch stores its data
+    - type: volume
+      source: esdata
+      target: /usr/share/elasticsearch/data
+      read_only: false
+    networks:
+      - network      
+
 # Volumes are virtual drives connected to containers
 volumes:
   # This volume contains the database and PostgreSQL configuration files
@@ -602,6 +627,9 @@ volumes:
 
   # RabbitMQ needs a volume at /var/lib/rabbitmq/
   rabbitmq_data:
+
+  # ElasticSearch needs a volume at /usr/share/elasticsearch/data
+  esdata:
 
   # Periodic dumps taken by Redis acting as channel layer
   channel_layer:

@@ -4,4 +4,5 @@
 docker-compose up -d \
     database \
     cache \
-    message-broker
+    message-broker \
+    elasticsearch
