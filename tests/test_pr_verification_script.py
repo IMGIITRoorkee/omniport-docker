@@ -217,5 +217,37 @@ class TestARunThatCheckedNothingIsNotAPass(unittest.TestCase):
         )
 
 
+class TestTheSpaFallbackIsNotMistakenForAPass(unittest.TestCase):
+    """
+    NGINX answers any path it does not route to Django with the React bundle,
+    200 text/html. Read as a status code alone that is indistinguishable from
+    a working endpoint, which is how a section can report success against
+    routes that are not mounted at all.
+    """
+
+    def test_core_routes_are_not_requested_under_the_api_prefix(self):
+        """
+        Core services are mounted at the root; only isApi apps are under /api/
+        """
+
+        script = SCRIPT.read_text()
+        for core in ('session_auth', 'base_auth', 'bootstrap', 'kernel'):
+            self.assertIn(core, script)
+        self.assertIn('CORE_PREFIXES', script)
+        self.assertIn('url_for', script)
+
+    def test_an_unmounted_route_is_reported_as_proving_nothing(self):
+        with MockDeployment('fixed', FIXED_PORT) as deployment:
+            code, output = deployment.run('backend-227')
+
+        # Every allow-listed core route answers JSON on the mock, so none of
+        # them should be dismissed as the frontend. The exit code is not
+        # asserted here: it depends on how faithfully the fixture models each
+        # endpoint's body handling, which other tests cover.
+        self.assertNotIn('frontend bundle answered', output)
+        for view in ('session login', 'site branding', 'recover password'):
+            self.assertIn(f'PASS {view}', output)
+
+
 if __name__ == '__main__':
     unittest.main()

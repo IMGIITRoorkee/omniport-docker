@@ -83,7 +83,7 @@ obtain_session() {
     local jar token session
     jar=$(mktemp)
 
-    curl -s -o /dev/null -c "$jar" --max-time 20 "$API/ensure_csrf/" 2>/dev/null
+    curl -s -o /dev/null -c "$jar" --max-time 20 "$BASE_URL/ensure_csrf/" 2>/dev/null
     token=$(awk '$6 == "csrftoken" {print $7}' "$jar" | tail -1)
 
     curl -s -o /dev/null -b "$jar" -c "$jar" --max-time 20 \
@@ -91,7 +91,7 @@ obtain_session() {
         -H "X-CSRFToken: $token" \
         -H "Referer: $BASE_URL/" \
         -d "{\"username\": \"$STAGING_USER\", \"password\": \"$STAGING_PASSWORD\"}" \
-        "$API/session_auth/login/" 2>/dev/null
+        "$BASE_URL/session_auth/login/" 2>/dev/null
 
     session=$(awk '$6 == "sessionid" {print $7}' "$jar" | tail -1)
     rm -f "$jar"
@@ -101,6 +101,28 @@ obtain_session() {
         return 0
     fi
     return 1
+}
+
+# Core services are mounted at the root of the deployment; only apps that
+# declare isApi in their configuration sit under /api/. Resolving that by path
+# means a check added later cannot pick the wrong base by hand.
+CORE_PREFIXES='session_auth base_auth bootstrap kernel token_auth open_auth ensure_csrf manifest hello'
+
+url_for() {
+    local path="$1" first
+    first=$(echo "$path" | cut -d/ -f2)
+    case " $CORE_PREFIXES " in
+        *" $first "*) echo "$BASE_URL$path" ;;
+        *)            echo "$API$path" ;;
+    esac
+}
+
+# NGINX answers a path it does not route to Django with the React bundle, 200
+# text/html. A status code cannot tell that from a working endpoint, so any
+# check expecting 200 would read a missing route as a pass.
+is_json_response() {
+    curl -s -o /dev/null -w '%{content_type}' --max-time 20 \
+        "$(url_for "$1")" 2>/dev/null | grep -qi 'application/json'
 }
 
 need_session() {
@@ -117,10 +139,10 @@ status_of() {
     if [ -n "$body" ]; then
         curl -s -o /dev/null -w "%{http_code}" --max-time 20 \
             -X "$method" -H "Content-Type: application/json" \
-            -d "$body" "$API$path" 2>/dev/null
+            -d "$body" "$(url_for "$path")" 2>/dev/null
     else
         curl -s -o /dev/null -w "%{http_code}" --max-time 20 \
-            -X "$method" "$API$path" 2>/dev/null
+            -X "$method" "$(url_for "$path")" 2>/dev/null
     fi
 }
 
@@ -130,15 +152,15 @@ authed_status_of() {
     if [ -n "$body" ]; then
         curl -s -o /dev/null -w "%{http_code}" --max-time 20 \
             -X "$method" -H "Content-Type: application/json" \
-            -H "Cookie: $SESSION_COOKIE" -d "$body" "$API$path" 2>/dev/null
+            -H "Cookie: $SESSION_COOKIE" -d "$body" "$(url_for "$path")" 2>/dev/null
     else
         curl -s -o /dev/null -w "%{http_code}" --max-time 20 \
-            -X "$method" -H "Cookie: $SESSION_COOKIE" "$API$path" 2>/dev/null
+            -X "$method" -H "Cookie: $SESSION_COOKIE" "$(url_for "$path")" 2>/dev/null
     fi
 }
 
 body_of() {
-    curl -s --max-time 20 "$API$1" 2>/dev/null
+    curl -s --max-time 20 "$(url_for "$1")" 2>/dev/null
 }
 
 # Assert an anonymous request lands on one of the expected codes.
@@ -151,6 +173,10 @@ expect_anonymous() {
 
     if [ "$code" = "000" ]; then
         warn "$description -> no response from $method $path"
+    elif ! is_json_response "$path"; then
+        warn "$description -> HTTP $code but not application/json, so the"
+        warn "frontend bundle answered and this route is not mounted here."
+        warn "The check proved nothing either way."
     elif echo " $expected " | grep -q " $code "; then
         pass "$description -> HTTP $code"
     elif [ "$code" -ge 500 ] 2>/dev/null; then
@@ -167,6 +193,10 @@ expect_authed() {
 
     if [ "$code" = "000" ]; then
         warn "$description -> no response from $method $path"
+    elif ! is_json_response "$path"; then
+        warn "$description -> HTTP $code but not application/json, so the"
+        warn "frontend bundle answered and this route is not mounted here."
+        warn "The check proved nothing either way."
     elif echo " $expected " | grep -q " $code "; then
         pass "$description -> HTTP $code"
     elif [ "$code" -ge 500 ] 2>/dev/null; then
@@ -472,7 +502,7 @@ section_formula_one_19() {
 TABLE
 
     print_test "ensure_csrf actually sets the cookie"
-    if curl -s -D - -o /dev/null --max-time 20 "$API/ensure_csrf/" 2>/dev/null \
+    if curl -s -D - -o /dev/null --max-time 20 "$BASE_URL/ensure_csrf/" 2>/dev/null \
        | grep -qi "set-cookie:.*csrftoken"; then
         pass "csrftoken cookie set"
     else

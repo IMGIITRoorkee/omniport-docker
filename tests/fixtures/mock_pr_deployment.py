@@ -13,18 +13,18 @@ PORT = int(sys.argv[2])
 
 # Routes that must answer without a session even after default-deny
 PUBLIC = (
-    '/api/session_auth/login/',
-    '/api/session_auth/illustration_roulette/',
-    '/api/bootstrap/site_branding/',
-    '/api/bootstrap/institute_branding/',
-    '/api/bootstrap/maintainers_branding/',
-    '/api/base_auth/recover_password/',
-    '/api/base_auth/verify/',
-    '/api/base_auth/reset_password/',
-    '/api/base_auth/verify_secret_answer/',
-    '/api/hello/',
-    '/api/ensure_csrf/',
-    '/api/manifest/',
+    '/session_auth/login/',
+    '/session_auth/illustration_roulette/',
+    '/bootstrap/site_branding/',
+    '/bootstrap/institute_branding/',
+    '/bootstrap/maintainers_branding/',
+    '/base_auth/recover_password/',
+    '/base_auth/verify/',
+    '/base_auth/reset_password/',
+    '/base_auth/verify_secret_answer/',
+    '/hello/',
+    '/ensure_csrf/',
+    '/manifest/',
     '/api/gif/roulette/',
     '/api/registration/create_session',
     '/api/registration/set_pass',
@@ -61,10 +61,15 @@ class Handler(BaseHTTPRequestHandler):
     def log_message(self, *args):
         pass
 
-    def _send(self, code, payload=None, extra=()):
-        body = json.dumps(payload).encode() if payload is not None else b'{}'
+    def _send(self, code, payload=None, extra=(), html=False):
+        if html:
+            body = b'<!doctype html><html></html>'
+        else:
+            body = json.dumps(payload).encode() if payload is not None else b'{}'
         self.send_response(code)
-        self.send_header('Content-Type', 'application/json')
+        self.send_header(
+            'Content-Type',
+            'text/html; charset=utf-8' if html else 'application/json')
         for name, value in extra:
             self.send_header(name, value)
         self.send_header('Content-Length', str(len(body)))
@@ -81,10 +86,14 @@ class Handler(BaseHTTPRequestHandler):
         vulnerable = MODE == 'vulnerable'
 
         if path == '/':
-            return self._send(200)
+            return self._send(200, html=True)
+
+        # An unrouted path: the bundle answers, not Django
+        if path == '/api/noticeboard/unrouted/':
+            return self._send(200, html=True)
 
         # ensure_csrf must set the cookie
-        if path == '/api/ensure_csrf/':
+        if path == '/ensure_csrf/':
             return self._send(200, {}, [('Set-Cookie', 'csrftoken=abc; Path=/')])
 
         # OPTIONS metadata for the maintainer site
