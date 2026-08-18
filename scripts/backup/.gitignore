@@ -1,0 +1,2 @@
+# Ignore the real backup transfer environment file (holds secrets)
+backup_transfer.env
