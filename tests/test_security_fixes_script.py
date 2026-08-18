@@ -192,5 +192,30 @@ class TestARunThatCheckedNothingIsNotAPass(unittest.TestCase):
         )
 
 
+class TestTheSpaFallbackIsNotMistakenForAPass(unittest.TestCase):
+    """
+    NGINX answers any path it does not route to Django with the React bundle,
+    200 text/html. A status code alone cannot tell that from a working
+    endpoint, and reading one as the other is how a whole section can report
+    success against routes that are not mounted.
+    """
+
+    def test_a_route_that_is_not_mounted_is_reported_as_such(self):
+        with MockDeployment('fixed', FIXED_PORT) as deployment:
+            _, output = deployment.run_script('noticeboard')
+
+        # Every notice route on the fixed mock answers JSON, so nothing should
+        # be dismissed as the frontend.
+        self.assertNotIn('frontend bundle answering', output)
+
+    def test_the_guard_fires_on_an_html_answer(self):
+        with MockDeployment('vulnerable', VULNERABLE_PORT) as deployment:
+            _, output = deployment.run_script('noticeboard')
+
+        for route in ('/api/noticeboard/new/', '/api/noticeboard/old/'):
+            self.assertIn(f'FAIL {route} -> HTTP 200', output,
+                          'a JSON 200 must still be reported as readable')
+
+
 if __name__ == '__main__':
     unittest.main()

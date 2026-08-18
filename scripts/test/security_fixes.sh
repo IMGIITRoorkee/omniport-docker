@@ -75,6 +75,15 @@ headers_for() {
     curl -s -D - -o /dev/null --max-time 15 "$BASE_URL$1" 2>/dev/null
 }
 
+# Is a response really from the API, or the frontend bundle answering for a
+# path NGINX never routes to Django? An SPA fallback is 200 text/html, so a
+# status code on its own cannot tell a working endpoint from a missing one.
+is_json_response() {
+    local path="$1"
+    curl -s -o /dev/null -w '%{content_type}' --max-time 20 \
+        "$BASE_URL$path" 2>/dev/null | grep -qi 'application/json'
+}
+
 # Return the status code for a path, with no credentials of any kind
 anonymous_status() {
     curl -s -o /dev/null -w "%{http_code}" --max-time 15 "$BASE_URL$1" 2>/dev/null
@@ -109,7 +118,7 @@ obtain_session() {
     jar=$(mktemp)
 
     curl -s -o /dev/null -c "$jar" --max-time 20 \
-        "$BASE_URL/api/ensure_csrf/" 2>/dev/null
+        "$BASE_URL/ensure_csrf/" 2>/dev/null
     token=$(awk '$6 == "csrftoken" {print $7}' "$jar" | tail -1)
 
     curl -s -o /dev/null -b "$jar" -c "$jar" --max-time 20 \
@@ -117,7 +126,7 @@ obtain_session() {
         -H "X-CSRFToken: $token" \
         -H "Referer: $BASE_URL/" \
         -d "{\"username\": \"$STAGING_USER\", \"password\": \"$STAGING_PASSWORD\"}" \
-        "$BASE_URL/api/session_auth/login/" 2>/dev/null
+        "$BASE_URL/session_auth/login/" 2>/dev/null
 
     session=$(awk '$6 == "sessionid" {print $7}' "$jar" | tail -1)
     rm -f "$jar"
@@ -264,6 +273,12 @@ test_noticeboard_requires_authentication() {
 
     for route in "${routes[@]}"; do
         code=$(anonymous_status "$route")
+        if ! is_json_response "$route"; then
+            warn "$route -> HTTP $code but not application/json, so this is the"
+            warn "frontend bundle answering rather than the API. The route is"
+            warn "not mounted here and this check proved nothing."
+            continue
+        fi
         case "$code" in
             401|403)
                 pass "$route -> HTTP $code"
@@ -422,7 +437,7 @@ main() {
     esac
 
     # Check if server is reachable
-    if ! curl -s -o /dev/null --max-time 15 "$BASE_URL/api/kernel/who_am_i/" 2>/dev/null; then
+    if ! curl -s -o /dev/null --max-time 15 "$BASE_URL/kernel/who_am_i/" 2>/dev/null; then
         if ! curl -s -o /dev/null --max-time 15 "$BASE_URL/" 2>/dev/null; then
             echo -e "${RED}ERROR: Cannot reach server at $BASE_URL${NC}"
             echo -e "${YELLOW}Make sure the server is running and URL is correct${NC}\n"
@@ -437,7 +452,7 @@ main() {
     elif [ -n "$STAGING_USER" ]; then
         echo -e "${YELLOW}Could not log in as $STAGING_USER; authenticated checks"
         echo -e "will be skipped. Check the credentials and that"
-        echo -e "$BASE_URL/api/session_auth/login/ is reachable.${NC}\n"
+        echo -e "$BASE_URL/session_auth/login/ is reachable.${NC}\n"
     fi
 
     case "$SECTION" in

@@ -24,6 +24,10 @@ FIXED_CSP = (
     "frame-ancestors 'self'"
 )
 
+# Answered by the React bundle rather than Django, as an unrouted path is on
+# the real deployment
+SPA_FALLBACK_PATH = '/api/noticeboard/unrouted/'
+
 NOTICE_ROUTES = (
     '/api/noticeboard/new/', '/api/noticeboard/old/',
     '/api/noticeboard/filter_list/', '/api/noticeboard/filter/',
@@ -37,8 +41,14 @@ class Handler(BaseHTTPRequestHandler):
     def log_message(self, *args):
         pass
 
-    def _send(self, code, body=b'', extra_headers=()):
+    def _send(self, code, body=b'', extra_headers=(), content_type=None):
         self.send_response(code)
+        self.send_header(
+            'Content-Type',
+            content_type or ('application/json' if self.path.startswith('/api/')
+                             or self.path.startswith('/kernel/')
+                             else 'text/html; charset=utf-8'),
+        )
         csp = VULNERABLE_CSP if MODE == 'vulnerable' else FIXED_CSP
         self.send_header('Content-Security-Policy', csp)
         self.send_header('X-Frame-Options', 'SAMEORIGIN')
@@ -54,6 +64,11 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         path = self.path.split('?')[0]
+
+        if path == SPA_FALLBACK_PATH:
+            return self._send(200, b'<!doctype html><html></html>',
+                              content_type='text/html; charset=utf-8')
+
         authenticated = 'sessionid=' in self.headers.get('Cookie', '')
 
         if path.startswith('/api/noticeboard/'):
