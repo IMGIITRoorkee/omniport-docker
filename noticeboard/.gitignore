@@ -1,0 +1,2 @@
+# Ignore the noticeboard environment variables
+elasticsearch.env
