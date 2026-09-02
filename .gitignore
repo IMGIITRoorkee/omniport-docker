@@ -7,5 +7,9 @@
 # Codebase (backend and frontend)
 codebase/
 
+# Python bytecode
+__pycache__/
+*.py[cod]
+
 # Local docker-compose overrides (per-developer, not committed)
 docker-compose.override.yml

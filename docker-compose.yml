@@ -217,46 +217,6 @@ services:
     networks:
     - network
 
-  redis-gui: # Redis Commander
-    # Use the Redis Commander image as is
-    image: rediscommander/redis-commander:latest
-
-    # Check the health of the container periodically
-    healthcheck:
-      test: ['CMD', 'nc', '-z', '127.0.0.1', '8081']
-      retries: 4
-
-      interval: 16m
-      timeout: 16s
-      start_period: 2m
-
-    # No matter what, if the container stops, start it again
-    restart: always 
-    
-    # Expose the port 8081 used by Redis commander to the host
-    ports:
-    - "8081:8081"
-
-    # Set the REDIS_HOSTS environment variable so that the Redis servers can be connected
-    environment:
-    - 'REDIS_HOSTS=
-      channel-layer:channel-layer,
-      session-store:session-store,
-      communication-store:communication-store,
-      application-store:application-store,
-      verification-store:verification-store'
-
-    # The services that need to be ready before this one
-    depends_on:
-    - channel-layer
-    - session-store
-    - communication-store
-    - verification-store
-
-    # Connect to the custom default network
-    networks:
-    - network
-
   cache: # Memcached
     # Use the Memcached image we made ourselves by running ./scripts/build/memcached.sh
     image: omniport-memcached:latest
