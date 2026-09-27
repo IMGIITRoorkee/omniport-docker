@@ -1,0 +1,8 @@
+[Unit]
+Description=Probe and repair Omniport's network storage mount
+After=omniport-network-storage.service docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/omniport-network-storage watchdog
+TimeoutStartSec=10min

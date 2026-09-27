@@ -1,0 +1,20 @@
+[Unit]
+Description=s3fs mount of img-icc-bucket behind Omniport's /external/
+Wants=network-online.target
+After=network-online.target
+Before=docker.service
+
+[Service]
+Environment=NS=/home/apps/omniport-docker/codebase/omniport-backend/network_storage
+ExecStartPre=/usr/local/sbin/omniport-network-storage release
+# -f keeps s3fs in the foreground so systemd owns it and records how it exits.
+# nonempty is required by s3fs 1.82: the repository tracks placeholders in the mountpoint.
+ExecStart=/usr/bin/s3fs img-icc-bucket ${NS} -f -o allow_other,nonempty,endpoint=ap-south-1,passwd_file=/home/apps/.passwd-s3fs,retries=5,connect_timeout=10,readwrite_timeout=30
+ExecStartPost=-/usr/local/sbin/omniport-network-storage await
+ExecStopPost=/usr/local/sbin/omniport-network-storage release
+Restart=always
+RestartSec=5
+TimeoutStopSec=15
+
+[Install]
+WantedBy=multi-user.target

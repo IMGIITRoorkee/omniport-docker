@@ -1,0 +1,10 @@
+[Unit]
+Description=Run the Omniport network storage watchdog every minute
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=1min
+AccuracySec=10s
+
+[Install]
+WantedBy=timers.target
