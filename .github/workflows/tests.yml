@@ -22,6 +22,15 @@ jobs:
     - name: Run the test suite
       run: python -m unittest discover --start-directory tests --verbose
 
+  shell:
+    name: Shell script lint
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Run shellcheck
+      run: shellcheck network-storage/*.sh
+
   nginx:
     name: NGINX configuration syntax
     runs-on: ubuntu-latest
