@@ -29,15 +29,6 @@ s3fs_connections() {
     }' "$MOUNTINFO"
 }
 
-# The repository commits placeholder directories into the mountpoint, so a
-# listing alone cannot tell a live mount from the bare directory underneath.
-top_is_s3fs() {
-    awk -v ns="$NS" '$5 == ns {
-        for (i = 7; i <= NF && $i != "-"; i++);
-        top = $(i + 1)
-    } END { exit top != "fuse.s3fs" }' "$MOUNTINFO"
-}
-
 # A request already sent to a hung FUSE daemon ignores even SIGKILL, so the
 # probe runs in the background and is abandoned rather than waited on.
 bounded() {
@@ -54,7 +45,9 @@ bounded() {
     wait "$pid"
 }
 
-host_alive() { top_is_s3fs && bounded ls -a "$NS"; }
+# The repository commits placeholder directories into the mountpoint, so a
+# listing alone cannot tell a live mount from the bare directory underneath.
+host_alive() { [ -n "$(s3fs_connections)" ] && bounded ls -a "$NS"; }
 
 compose() { (cd "$COMPOSE_DIR" && docker-compose "$@"); }
 
